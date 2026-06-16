@@ -1,5 +1,7 @@
+import { createClient } from "@/lib/supabase/server";
 import { PeopleCard } from "@/components/ui/people-card";
-import { MOCK_BUILDERS, ROLES, SKILLS } from "@/lib/mock-data";
+import { ROLES, SKILLS } from "@/lib/mock-data";
+import { type DbBuilder } from "@/lib/types";
 
 export default function BuildersPage({
   searchParams,
@@ -15,17 +17,20 @@ async function BuildersContent({
   searchParams: Promise<{ role?: string; skill?: string; q?: string }>;
 }) {
   const { role, skill, q } = await searchParams;
+  const supabase = await createClient();
 
-  const filtered = MOCK_BUILDERS.filter((b) => {
-    const matchesRole  = role  ? b.role === role : true;
-    const matchesSkill = skill ? b.skills.includes(skill as never) : true;
-    const matchesQuery = q
-      ? b.name.toLowerCase().includes(q.toLowerCase()) ||
-        b.bio.toLowerCase().includes(q.toLowerCase())
-      : true;
-    return matchesRole && matchesSkill && matchesQuery;
-  });
+  let query = supabase
+    .from("profiles")
+    .select("id, username, full_name, role, bio, location, skills")
+    .not("username", "is", null)
+    .order("updated_at", { ascending: false });
 
+  if (role)  query = query.eq("role", role);
+  if (skill) query = query.contains("skills", [skill]);
+  if (q)     query = query.or(`full_name.ilike.%${q}%,bio.ilike.%${q}%,username.ilike.%${q}%`);
+
+  const { data: builders } = await query;
+  const results = (builders ?? []) as DbBuilder[];
   const hasFilter = role || skill || q;
 
   return (
@@ -39,9 +44,9 @@ async function BuildersContent({
           <span className="text-orange">builders</span>
         </h1>
         <p className="text-sm text-muted">
-          {filtered.length} builder{filtered.length !== 1 ? "s" : ""}
-          {role  ? ` · ${role}`  : ""}
-          {skill ? ` · ${skill}` : ""}
+          {results.length} builder{results.length !== 1 ? "s" : ""}
+          {role  ? ` · ${role}`   : ""}
+          {skill ? ` · ${skill}`  : ""}
           {q     ? ` matching "${q}"` : ""}
         </p>
       </div>
@@ -94,9 +99,9 @@ async function BuildersContent({
         </div>
       </div>
 
-      {filtered.length > 0 ? (
+      {results.length > 0 ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((builder) => (
+          {results.map((builder) => (
             <PeopleCard key={builder.id} builder={builder} />
           ))}
         </div>

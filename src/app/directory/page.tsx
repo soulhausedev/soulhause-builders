@@ -1,5 +1,8 @@
+import { createClient } from "@/lib/supabase/server";
 import { ProjectCard } from "@/components/ui/project-card";
-import { MOCK_PROJECTS, ALL_TAGS } from "@/lib/mock-data";
+import { CATEGORIES } from "@/lib/mock-data";
+import { type DbProject } from "@/lib/types";
+import Link from "next/link";
 
 export default function DirectoryPage({
   searchParams,
@@ -15,25 +18,33 @@ async function DirectoryContent({
   searchParams: Promise<{ tag?: string; q?: string }>;
 }) {
   const { tag, q } = await searchParams;
+  const supabase = await createClient();
 
-  const filtered = MOCK_PROJECTS.filter((p) => {
-    const matchesTag = tag ? p.tags.includes(tag) : true;
-    const matchesQuery = q
-      ? p.title.toLowerCase().includes(q.toLowerCase()) ||
-        p.description.toLowerCase().includes(q.toLowerCase())
-      : true;
-    return matchesTag && matchesQuery;
-  });
+  let query = supabase
+    .from("projects")
+    .select("id, title, description, image_url, tags, project_type, link_url, link_label, created_at, user_id, profiles(username, full_name)")
+    .order("created_at", { ascending: false });
+
+  if (tag) query = query.contains("tags", [tag]);
+  if (q)   query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
+
+  const { data: projects } = await query;
+  const results = (projects ?? []) as unknown as DbProject[];
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
-      {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-1 text-2xl font-bold text-teal-deep">All projects</h1>
+        <h1
+          className="mb-1 text-3xl"
+          style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
+        >
+          <span className="text-teal-deep">All</span>{" "}
+          <span className="text-orange">projects</span>
+        </h1>
         <p className="text-sm text-muted">
-          {filtered.length} project{filtered.length !== 1 ? "s" : ""}
+          {results.length} project{results.length !== 1 ? "s" : ""}
           {tag ? ` in "${tag}"` : ""}
-          {q ? ` matching "${q}"` : ""}
+          {q   ? ` matching "${q}"` : ""}
         </p>
       </div>
 
@@ -46,10 +57,7 @@ async function DirectoryContent({
           className="h-9 flex-1 rounded-lg border border-border bg-surface px-3 text-sm text-teal-deep placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-teal"
         />
         {(q || tag) && (
-          <a
-            href="/directory"
-            className="flex h-9 items-center rounded-lg border border-border bg-surface px-3 text-sm text-muted hover:text-terra"
-          >
+          <a href="/directory" className="flex h-9 items-center rounded-lg border border-border bg-surface px-3 text-sm text-muted hover:text-terra">
             Clear
           </a>
         )}
@@ -57,46 +65,34 @@ async function DirectoryContent({
 
       {/* Category filters */}
       <div className="mb-8 flex flex-wrap gap-2">
-        <a
-          href="/directory"
-          className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-            !tag
-              ? "border-teal bg-teal text-white"
-              : "border-border bg-surface text-muted hover:border-teal hover:text-teal"
-          }`}
-        >
-          All
-        </a>
-        {ALL_TAGS.map((t) => (
-          <a
-            key={t}
-            href={`/directory?tag=${encodeURIComponent(t)}`}
-            className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-              tag === t
-                ? "border-teal bg-teal text-white"
-                : "border-border bg-surface text-muted hover:border-teal hover:text-teal"
-            }`}
-          >
+        <a href="/directory" className={pill(!tag)}>All</a>
+        {CATEGORIES.map((t) => (
+          <a key={t} href={`/directory?tag=${encodeURIComponent(t)}`} className={pill(tag === t)}>
             {t}
           </a>
         ))}
       </div>
 
-      {/* Grid */}
-      {filtered.length > 0 ? (
+      {results.length > 0 ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((project) => (
+          {results.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>
       ) : (
         <div className="py-20 text-center text-muted">
-          No projects found.{" "}
-          <a href="/directory" className="text-teal underline">
-            Clear filters
-          </a>
+          No projects yet.{" "}
+          <Link href="/projects/new" className="text-teal underline">Be the first to add one.</Link>
         </div>
       )}
     </div>
   );
+}
+
+function pill(active: boolean) {
+  return `rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+    active
+      ? "border-teal bg-teal text-white"
+      : "border-border bg-surface text-muted hover:border-teal hover:text-teal"
+  }`;
 }
