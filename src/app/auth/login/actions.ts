@@ -7,7 +7,10 @@ import { headers } from "next/headers";
 export async function signInWithGoogle() {
   const supabase = await createClient();
   const headersList = await headers();
-  const origin = headersList.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const origin =
+    headersList.get("origin") ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (() => { throw new Error("NEXT_PUBLIC_SITE_URL is not set"); })();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
