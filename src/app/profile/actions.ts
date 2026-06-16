@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { validateUrl } from "@/lib/validate-url";
 import { redirect } from "next/navigation";
 
 export async function saveProfile(formData: FormData) {
@@ -8,6 +9,10 @@ export async function saveProfile(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect("/auth/login");
+
+  const website = formData.get("website") as string;
+  const websiteError = validateUrl(website, { required: false });
+  if (websiteError) redirect("/profile?error=" + encodeURIComponent(websiteError));
 
   const skills = formData.getAll("skills") as string[];
 
@@ -19,7 +24,7 @@ export async function saveProfile(formData: FormData) {
     role:       formData.get("role")       as string,
     bio:        formData.get("bio")        as string,
     skills,
-    website:    formData.get("website")    as string,
+    website:    website || null,
     github:     formData.get("github")     as string,
     twitter:    formData.get("twitter")    as string,
     linkedin:   formData.get("linkedin")   as string,

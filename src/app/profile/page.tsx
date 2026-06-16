@@ -240,7 +240,7 @@ export default async function ProfilePage() {
           <div className="rounded-xl border border-border bg-surface p-6">
             <p className="mb-4 text-sm font-semibold text-teal-deep">Social links</p>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Website" name="website" defaultValue={profile?.website ?? ""} placeholder="https://yoursite.com" />
+              <Field label="Website" name="website" type="url" defaultValue={profile?.website ?? ""} placeholder="https://yoursite.com" />
               <Field label="GitHub username" name="github" defaultValue={profile?.github ?? ""} placeholder="yourusername" />
               <Field label="X / Twitter handle" name="twitter" defaultValue={profile?.twitter ?? ""} placeholder="yourusername" />
               <Field label="LinkedIn username" name="linkedin" defaultValue={profile?.linkedin ?? ""} placeholder="yourusername" />
@@ -269,11 +269,13 @@ function Field({
   name,
   defaultValue,
   placeholder,
+  type = "text",
 }: {
   label: string;
   name: string;
   defaultValue: string;
   placeholder: string;
+  type?: string;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -281,7 +283,7 @@ function Field({
       <input
         id={name}
         name={name}
-        type="text"
+        type={type}
         defaultValue={defaultValue}
         placeholder={placeholder}
         className="h-9 rounded-lg border border-border bg-cream px-3 text-sm text-teal-deep placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-teal"
