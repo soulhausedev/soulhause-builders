@@ -1,65 +1,159 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ProjectCard } from "@/components/ui/project-card";
+import { PeopleCard } from "@/components/ui/people-card";
+import { SunMark } from "@/components/ui/sun-mark";
+import { MOCK_PROJECTS, MOCK_BUILDERS } from "@/lib/mock-data";
+import { THIS_WEEK } from "@/lib/leaderboard-data";
 
-export default function Home() {
+export default function HomePage() {
+  const featured  = MOCK_PROJECTS.slice(0, 3);
+  const builders  = MOCK_BUILDERS.slice(0, 3);
+  const topThis   = THIS_WEEK[0];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="dot-grid">
+
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <section className="relative mx-auto max-w-5xl px-6 pt-20 pb-16 overflow-hidden">
+        <SunMark size={380} opacity={0.05} color="#4F9080" className="absolute -right-16 -top-16" />
+        <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
+          § 01 — The platform
+        </p>
+        <h1
+          className="mb-6 max-w-3xl text-5xl leading-tight sm:text-6xl"
+          style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
+        >
+          <span className="text-teal-deep">Build in public.</span>
+          <br />
+          <span className="text-orange">Get seen.</span>
+        </h1>
+        <p className="mb-8 max-w-lg text-lg text-muted">
+          Your project deserves to be seen. Post it, link it, and let the work speak for itself.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/auth/login">
+            <Button size="lg">Add your project</Button>
+          </Link>
+          <Link href="/leaderboard">
+            <Button variant="outline" size="lg">🔥 This week&apos;s top builds</Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* ── This week's #1 ───────────────────────────────────────────────── */}
+      <section className="border-y border-border bg-surface">
+        <div className="mx-auto max-w-5xl px-6 py-10">
+          <div className="mb-6 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              § 02 — Top build this week
+            </p>
+            <Link href="/leaderboard" className="text-xs font-medium text-teal hover:text-teal-dark">
+              Full leaderboard →
+            </Link>
+          </div>
+
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-bold text-white"
+              style={{ fontFamily: "var(--font-retro)", backgroundColor: topThis.authorColor }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
+              🥇
+            </div>
+            <div className="flex-1">
+              <h2
+                className="text-2xl"
+                style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
+              >
+                <span className="text-teal-deep">{topThis.title}</span>
+              </h2>
+              <p className="mt-1 max-w-xl text-sm text-muted">{topThis.description}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted">
+                <span>by <Link href={`/p/${topThis.authorUsername}`} className="font-medium text-teal hover:text-teal-dark">{topThis.authorName}</Link></span>
+                <span>·</span>
+                <span>🔥 {topThis.views.toLocaleString()} views this week</span>
+                <span>·</span>
+                <span>⚡ {topThis.streak} week streak</span>
+              </div>
+            </div>
             <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              href={topThis.linkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 rounded-lg border border-border bg-cream px-4 py-2 text-sm font-medium text-teal-deep transition-colors hover:border-teal hover:text-teal"
             >
-              Learning
-            </a>{" "}
-            center.
+              {topThis.linkLabel} →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Recent projects ──────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-5xl px-6 py-14">
+        <div className="mb-6 flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+            § 03 — Recent projects
           </p>
+          <Link href="/directory" className="text-xs font-medium text-teal hover:text-teal-dark">
+            Browse all →
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
         </div>
-      </main>
+      </section>
+
+      {/* ── Builders ─────────────────────────────────────────────────────── */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-5xl px-6 py-14">
+          <div className="mb-6 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              § 04 — Builders
+            </p>
+            <Link href="/builders" className="text-xs font-medium text-teal hover:text-teal-dark">
+              Find builders →
+            </Link>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {builders.map((builder) => (
+              <PeopleCard key={builder.id} builder={builder} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden border-t border-border bg-teal-deep">
+        <SunMark size={320} opacity={0.08} color="#F5C432" className="absolute -left-12 -bottom-12" />
+        <SunMark size={200} opacity={0.06} color="#E8703A" className="absolute -right-8 -top-8" />
+        <div className="relative mx-auto max-w-5xl px-6 py-16 text-center">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-teal-pale">
+            § 05 — Your turn
+          </p>
+          <h2
+            className="mb-4 text-4xl text-cream"
+            style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
+          >
+            Stop hiding what you built.
+          </h2>
+          <p className="mb-8 text-muted-foreground mx-auto max-w-md text-teal-pale">
+            Post your project in 2 minutes. No account setup. No pitch deck. Just your work.
+          </p>
+          <Link href="/auth/login">
+            <Button
+              size="lg"
+              className="bg-orange text-white hover:bg-terra"
+            >
+              Add your project now
+            </Button>
+          </Link>
+        </div>
+      </section>
+
     </div>
   );
 }
