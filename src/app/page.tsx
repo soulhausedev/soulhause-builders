@@ -61,9 +61,6 @@ export default async function HomePage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative mx-auto max-w-5xl px-4 sm:px-6 pt-12 sm:pt-20 pb-10 sm:pb-16 overflow-hidden">
         <SunMark size={280} opacity={0.05} color="#4F9080" className="absolute -right-10 -top-10 hidden sm:block" />
-        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
-          § 01 — The platform
-        </p>
         <h1
           className="mb-5 max-w-3xl text-4xl leading-tight sm:text-5xl lg:text-6xl"
           style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
@@ -87,11 +84,11 @@ export default async function HomePage() {
 
       {/* ── This week's #1 ───────────────────────────────────────────────── */}
       <section className="border-y border-border bg-surface">
-        <div className="mx-auto max-w-5xl px-6 py-10">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
           <div className="mb-6 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-              § 02 — Top build this week
-            </p>
+            <h2 className="text-lg font-bold text-teal-deep" style={{ fontFamily: "var(--font-retro)" }}>
+              🔥 Top build this week
+            </h2>
             <Link href="/leaderboard" className="text-xs font-medium text-teal hover:text-teal-dark">
               Full leaderboard →
             </Link>
@@ -145,11 +142,11 @@ export default async function HomePage() {
       </section>
 
       {/* ── Recent projects ──────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-5xl px-6 py-14">
+      <section className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
         <div className="mb-6 flex items-center justify-between">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-            § 03 — Recent projects
-          </p>
+          <h2 className="text-lg font-bold text-teal-deep" style={{ fontFamily: "var(--font-retro)" }}>
+            Recent projects
+          </h2>
           <Link href="/directory" className="text-xs font-medium text-teal hover:text-teal-dark">
             Browse all →
           </Link>
@@ -171,11 +168,11 @@ export default async function HomePage() {
 
       {/* ── Builders ─────────────────────────────────────────────────────── */}
       <section className="border-t border-border">
-        <div className="mx-auto max-w-5xl px-6 py-14">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 py-12">
           <div className="mb-6 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-              § 04 — Builders
-            </p>
+            <h2 className="text-lg font-bold text-teal-deep" style={{ fontFamily: "var(--font-retro)" }}>
+              Builders
+            </h2>
             <Link href="/builders" className="text-xs font-medium text-teal hover:text-teal-dark">
               Find builders →
             </Link>
@@ -201,9 +198,6 @@ export default async function HomePage() {
         <SunMark size={220} opacity={0.08} color="#F5C432" className="absolute -left-10 -bottom-10" />
         <SunMark size={160} opacity={0.06} color="#E8703A" className="absolute -right-6 -top-6" />
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6 py-12 sm:py-16 text-center">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-teal-pale">
-            § 05 — Your turn
-          </p>
           <h2
             className="mb-4 text-3xl sm:text-4xl text-cream"
             style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
