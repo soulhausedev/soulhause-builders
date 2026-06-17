@@ -22,9 +22,12 @@ export const metadata: Metadata = {
   keywords: ["builders", "indie hackers", "projects", "community", "developers", "creators", "showcase"],
   authors: [{ name: "Soulhause Builders", url: "https://soulhausebuilders.com" }],
   icons: {
-    icon: "/logo.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/logo.png", sizes: "512x512", type: "image/png" },
+    ],
     apple: "/logo.png",
-    shortcut: "/logo.png",
+    shortcut: "/favicon.ico",
   },
   openGraph: {
     type: "website",
