@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { MobileMenu } from "@/components/layout/mobile-menu";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
 
@@ -11,14 +12,16 @@ export async function Navbar() {
   } = await supabase.auth.getUser();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-cream transition-colors duration-200">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-cream">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="https://soulhausebuilders.com" className="flex items-center gap-2">
+
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 shrink-0">
           <div style={{ backgroundColor: "#F5F0E6" }} className="rounded-lg overflow-hidden shrink-0">
-            <Image src="/logo.png" alt="Soulhause Builders" width={52} height={52} />
+            <Image src="/logo.png" alt="Soulhause Builders" width={44} height={44} />
           </div>
           <span
-            className="text-2xl leading-none tracking-tight"
+            className="text-xl leading-none tracking-tight"
             style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
           >
             <span className="text-teal-deep">Soulhause</span>
@@ -26,7 +29,8 @@ export async function Navbar() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-2">
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-2">
           <Link href="/leaderboard">
             <Button variant="ghost" size="sm">🔥 This Week</Button>
           </Link>
@@ -52,6 +56,9 @@ export async function Navbar() {
             </Link>
           )}
         </nav>
+
+        {/* Mobile hamburger */}
+        <MobileMenu isLoggedIn={!!user} />
       </div>
     </header>
   );

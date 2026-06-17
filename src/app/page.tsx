@@ -59,28 +59,28 @@ export default async function HomePage() {
     <div className="dot-grid">
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative mx-auto max-w-5xl px-6 pt-20 pb-16 overflow-hidden">
-        <SunMark size={380} opacity={0.05} color="#4F9080" className="absolute -right-16 -top-16" />
-        <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
+      <section className="relative mx-auto max-w-5xl px-4 sm:px-6 pt-12 sm:pt-20 pb-10 sm:pb-16 overflow-hidden">
+        <SunMark size={280} opacity={0.05} color="#4F9080" className="absolute -right-10 -top-10 hidden sm:block" />
+        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
           § 01 — The platform
         </p>
         <h1
-          className="mb-6 max-w-3xl text-5xl leading-tight sm:text-6xl"
+          className="mb-5 max-w-3xl text-4xl leading-tight sm:text-5xl lg:text-6xl"
           style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
         >
           <span className="text-teal-deep">Build in public.</span>
           <br />
           <span className="text-orange">Get seen.</span>
         </h1>
-        <p className="mb-8 max-w-lg text-lg text-muted">
+        <p className="mb-7 max-w-lg text-base sm:text-lg text-muted">
           Your project deserves to be seen. Post it, link it, and let the work speak for itself.
         </p>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/auth/login">
-            <Button size="lg">Add your project</Button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link href="/auth/login" className="w-full sm:w-auto">
+            <Button size="lg" className="w-full sm:w-auto">Add your project</Button>
           </Link>
-          <Link href="/leaderboard">
-            <Button variant="outline" size="lg">🔥 This week&apos;s top builds</Button>
+          <Link href="/leaderboard" className="w-full sm:w-auto">
+            <Button variant="outline" size="lg" className="w-full sm:w-auto">🔥 This week&apos;s top builds</Button>
           </Link>
         </div>
       </section>
@@ -198,23 +198,23 @@ export default async function HomePage() {
 
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-t border-border bg-teal-deep">
-        <SunMark size={320} opacity={0.08} color="#F5C432" className="absolute -left-12 -bottom-12" />
-        <SunMark size={200} opacity={0.06} color="#E8703A" className="absolute -right-8 -top-8" />
-        <div className="relative mx-auto max-w-5xl px-6 py-16 text-center">
+        <SunMark size={220} opacity={0.08} color="#F5C432" className="absolute -left-10 -bottom-10" />
+        <SunMark size={160} opacity={0.06} color="#E8703A" className="absolute -right-6 -top-6" />
+        <div className="relative mx-auto max-w-5xl px-4 sm:px-6 py-12 sm:py-16 text-center">
           <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-teal-pale">
             § 05 — Your turn
           </p>
           <h2
-            className="mb-4 text-4xl text-cream"
+            className="mb-4 text-3xl sm:text-4xl text-cream"
             style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
           >
             Stop hiding what you built.
           </h2>
-          <p className="mb-8 mx-auto max-w-md text-teal-pale">
+          <p className="mb-8 mx-auto max-w-md text-teal-pale text-sm sm:text-base">
             Post your project in 2 minutes. No pitch deck. Just your work.
           </p>
           <Link href="/auth/login">
-            <Button size="lg" className="bg-orange text-white hover:bg-terra">
+            <Button size="lg" className="bg-orange text-white hover:bg-terra w-full sm:w-auto">
               Add your project now
             </Button>
           </Link>

@@ -38,10 +38,10 @@ export default async function ProfilePage() {
   const displayName = profile?.full_name || user.email || "Builder";
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 space-y-12">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12 space-y-10 sm:space-y-12">
 
       {/* ── Profile summary card ── */}
-      <section className="rounded-2xl border border-border bg-surface p-6 flex items-start gap-5">
+      <section className="rounded-2xl border border-border bg-surface p-4 sm:p-6 flex items-start gap-4 sm:gap-5">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full overflow-hidden text-2xl font-bold text-white bg-teal">
           {profile?.avatar_url ? (
             <Image
@@ -93,7 +93,7 @@ export default async function ProfilePage() {
           )}
         </div>
         {profile?.full_name && (
-          <div className="text-xs text-muted text-right shrink-0">
+          <div className="text-xs text-muted text-right shrink-0 hidden sm:block">
             {profile.full_name}
           </div>
         )}

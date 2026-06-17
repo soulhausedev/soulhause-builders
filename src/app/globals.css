@@ -33,8 +33,10 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* ─── Custom sun cursor ──────────────────────────────────────────────────── */
-* { cursor: none !important; }
+/* ─── Custom sun cursor — mouse only, not touch ─────────────────────────── */
+@media (pointer: fine) {
+  * { cursor: none !important; }
+}
 
 @keyframes sun-spin {
   from { transform: rotate(0deg); }

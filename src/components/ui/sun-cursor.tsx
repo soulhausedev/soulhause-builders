@@ -3,10 +3,17 @@
 import { useEffect, useState } from "react";
 
 export function SunCursor() {
-  const [pos, setPos]     = useState({ x: -200, y: -200 });
+  const [pos, setPos]       = useState({ x: -200, y: -200 });
   const [visible, setVisible] = useState(false);
+  const [isTouch, setIsTouch] = useState(true); // assume touch until proven otherwise
 
   useEffect(() => {
+    // Only show custom cursor on devices with a fine pointer (mouse), not touch
+    const mq = window.matchMedia("(pointer: fine)");
+    setIsTouch(!mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsTouch(!e.matches);
+    mq.addEventListener("change", onChange);
+
     const move = (e: MouseEvent) => {
       setPos({ x: e.clientX, y: e.clientY });
       setVisible(true);
@@ -16,10 +23,13 @@ export function SunCursor() {
     window.addEventListener("mousemove", move);
     window.addEventListener("mouseleave", hide);
     return () => {
+      mq.removeEventListener("change", onChange);
       window.removeEventListener("mousemove", move);
       window.removeEventListener("mouseleave", hide);
     };
   }, []);
+
+  if (isTouch) return null;
 
   return (
     <div
