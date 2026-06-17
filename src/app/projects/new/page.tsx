@@ -25,7 +25,7 @@ export default async function NewProjectPage() {
           <span className="text-orange">project</span>
         </h1>
         <p className="mt-1 text-sm text-muted">
-          Free and open source projects only — no paid products.
+          Free to list. Your app can be free, paid, or open source.
         </p>
       </div>
 
@@ -62,23 +62,27 @@ export default async function NewProjectPage() {
             />
           </div>
 
-          {/* Project type — required */}
+          {/* Project type */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-teal-deep">
               Type <span className="text-orange">*</span>
             </label>
-            <p className="text-xs text-muted -mt-1">Pick all that apply. Paid products are not allowed.</p>
+            <p className="text-xs text-muted -mt-1">Pick all that apply.</p>
             <div className="flex flex-wrap gap-2">
-              {(["Free", "Open Source"] as const).map((type) => (
-                <label key={type} className="flex items-center gap-2 cursor-pointer group">
+              {([
+                { value: "Free",        emoji: "🆓", label: "Free"        },
+                { value: "Paid",        emoji: "💰", label: "Paid"        },
+                { value: "Open Source", emoji: "🔓", label: "Open Source" },
+              ]).map(({ value, emoji, label }) => (
+                <label key={value} className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="checkbox"
                     name="project_type"
-                    value={type}
+                    value={value}
                     className="sr-only peer"
                   />
                   <span className="rounded-full border border-border bg-cream px-3 py-1 text-xs font-medium text-muted transition-colors peer-checked:border-teal peer-checked:bg-teal peer-checked:text-white group-hover:border-teal group-hover:text-teal">
-                    {type === "Free" ? "🆓 Free" : "🔓 Open Source"}
+                    {emoji} {label}
                   </span>
                 </label>
               ))}

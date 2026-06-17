@@ -4,10 +4,16 @@ import { CATEGORIES } from "@/lib/mock-data";
 import { type DbProject } from "@/lib/types";
 import Link from "next/link";
 
+const PROJECT_TYPES = [
+  { value: "Free",        emoji: "🆓" },
+  { value: "Paid",        emoji: "💰" },
+  { value: "Open Source", emoji: "🔓" },
+] as const;
+
 export default function DirectoryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tag?: string; q?: string }>;
+  searchParams: Promise<{ tag?: string; type?: string; q?: string }>;
 }) {
   return <DirectoryContent searchParams={searchParams} />;
 }
@@ -15,9 +21,9 @@ export default function DirectoryPage({
 async function DirectoryContent({
   searchParams,
 }: {
-  searchParams: Promise<{ tag?: string; q?: string }>;
+  searchParams: Promise<{ tag?: string; type?: string; q?: string }>;
 }) {
-  const { tag, q } = await searchParams;
+  const { tag, type, q } = await searchParams;
   const supabase = await createClient();
 
   let query = supabase
@@ -25,8 +31,9 @@ async function DirectoryContent({
     .select("id, title, description, image_url, tags, project_type, link_url, link_label, created_at, user_id, profiles(username, full_name)")
     .order("created_at", { ascending: false });
 
-  if (tag) query = query.contains("tags", [tag]);
-  if (q)   query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
+  if (tag)  query = query.contains("tags", [tag]);
+  if (type) query = query.contains("project_type", [type]);
+  if (q)    query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`);
 
   const { data: projects } = await query;
   const results = (projects ?? []) as unknown as DbProject[];
@@ -43,8 +50,9 @@ async function DirectoryContent({
         </h1>
         <p className="text-sm text-muted">
           {results.length} project{results.length !== 1 ? "s" : ""}
-          {tag ? ` in "${tag}"` : ""}
-          {q   ? ` matching "${q}"` : ""}
+          {type ? ` · ${type}` : ""}
+          {tag  ? ` in "${tag}"` : ""}
+          {q    ? ` matching "${q}"` : ""}
         </p>
       </div>
 
@@ -56,21 +64,41 @@ async function DirectoryContent({
           placeholder="Search projects…"
           className="h-9 flex-1 rounded-lg border border-border bg-surface px-3 text-sm text-teal-deep placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-teal"
         />
-        {(q || tag) && (
+        {(q || tag || type) && (
           <a href="/directory" className="flex h-9 items-center rounded-lg border border-border bg-surface px-3 text-sm text-muted hover:text-terra">
             Clear
           </a>
         )}
       </form>
 
+      {/* Type filters */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        <a href={tag ? `/directory?tag=${encodeURIComponent(tag)}` : "/directory"} className={pill(!type)}>
+          All types
+        </a>
+        {PROJECT_TYPES.map(({ value, emoji }) => {
+          const href = `/directory?type=${encodeURIComponent(value)}${tag ? `&tag=${encodeURIComponent(tag)}` : ""}`;
+          return (
+            <a key={value} href={href} className={pill(type === value)}>
+              {emoji} {value}
+            </a>
+          );
+        })}
+      </div>
+
       {/* Category filters */}
       <div className="mb-8 flex flex-wrap gap-2">
-        <a href="/directory" className={pill(!tag)}>All</a>
-        {CATEGORIES.map((t) => (
-          <a key={t} href={`/directory?tag=${encodeURIComponent(t)}`} className={pill(tag === t)}>
-            {t}
-          </a>
-        ))}
+        <a href={type ? `/directory?type=${encodeURIComponent(type)}` : "/directory"} className={pill(!tag)}>
+          All categories
+        </a>
+        {CATEGORIES.map((t) => {
+          const href = `/directory?tag=${encodeURIComponent(t)}${type ? `&type=${encodeURIComponent(type)}` : ""}`;
+          return (
+            <a key={t} href={href} className={pill(tag === t)}>
+              {t}
+            </a>
+          );
+        })}
       </div>
 
       {results.length > 0 ? (

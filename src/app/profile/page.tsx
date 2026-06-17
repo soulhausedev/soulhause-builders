@@ -155,11 +155,14 @@ export default async function ProfilePage() {
                     Edit
                   </Link>
                 </div>
-                {/* Free / Open Source badges */}
+                {/* Type badges */}
                 {project.project_type?.length > 0 && (
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap gap-1.5">
                     {project.project_type.includes("Free") && (
                       <span className="rounded-full bg-gold/20 border border-gold/40 px-2 py-0.5 text-xs font-medium text-teal-deep">🆓 Free</span>
+                    )}
+                    {project.project_type.includes("Paid") && (
+                      <span className="rounded-full bg-orange/10 border border-orange/30 px-2 py-0.5 text-xs font-medium text-orange">💰 Paid</span>
                     )}
                     {project.project_type.includes("Open Source") && (
                       <span className="rounded-full bg-teal/10 border border-teal/30 px-2 py-0.5 text-xs font-medium text-teal-deep">🔓 Open Source</span>
