@@ -10,16 +10,7 @@
  *  - Hostname TLD must be 2–13 alpha characters
  */
 
-const PRIVATE_IP_RE = /^(
-  127\.                          # 127.0.0.0/8 loopback
-  |10\.                          # 10.0.0.0/8
-  |172\.(1[6-9]|2\d|3[01])\.    # 172.16.0.0/12
-  |192\.168\.                    # 192.168.0.0/16
-  |169\.254\.                    # 169.254.0.0/16 link-local
-  |::1$                          # IPv6 loopback
-  |fc[0-9a-f]{2}:               # IPv6 unique-local fc00::/7
-  |fd[0-9a-f]{2}:               # IPv6 unique-local fd00::/7
-)/xi;
+const PRIVATE_IP_RE = /^(127\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|169\.254\.|::1$|fc[0-9a-f]{2}:|fd[0-9a-f]{2}:)/i;
 
 export function validateUrl(
   raw: string | null | undefined,
