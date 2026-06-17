@@ -40,6 +40,9 @@ export async function Navbar() {
           <Link href="/builders">
             <Button variant="ghost" size="sm">Builders</Button>
           </Link>
+          <Link href="/resources">
+            <Button variant="ghost" size="sm">Resources</Button>
+          </Link>
 
           {user ? (
             <>

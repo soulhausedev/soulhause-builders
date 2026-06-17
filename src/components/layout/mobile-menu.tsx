@@ -40,6 +40,7 @@ export function MobileMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
             <MobileLink href="/leaderboard" onClick={() => setOpen(false)}>🔥 This Week</MobileLink>
             <MobileLink href="/directory"   onClick={() => setOpen(false)}>Projects</MobileLink>
             <MobileLink href="/builders"    onClick={() => setOpen(false)}>Builders</MobileLink>
+            <MobileLink href="/resources"   onClick={() => setOpen(false)}>Resources</MobileLink>
 
             <div className="my-2 border-t border-border" />
 
