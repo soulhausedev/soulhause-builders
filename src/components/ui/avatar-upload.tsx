@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { type ChangeEvent, useRef, useState } from "react";
 
 interface AvatarUploadProps {
   userId: string;
@@ -17,7 +17,7 @@ export function AvatarUpload({ userId, currentUrl, initials }: AvatarUploadProps
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
