@@ -2,7 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ROLES } from "@/lib/mock-data";
 import { saveProfile } from "./actions";
+import { AvatarUpload } from "@/components/ui/avatar-upload";
 import { SkillsPicker } from "@/components/ui/skills-picker";
+import Image from "next/image";
 import Link from "next/link";
 
 export default async function ProfilePage() {
@@ -40,11 +42,18 @@ export default async function ProfilePage() {
 
       {/* ── Profile summary card ── */}
       <section className="rounded-2xl border border-border bg-surface p-6 flex items-start gap-5">
-        <div
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-2xl font-bold text-white"
-          style={{ backgroundColor: "#4F9080" }}
-        >
-          {initials}
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full overflow-hidden text-2xl font-bold text-white bg-teal">
+          {profile?.avatar_url ? (
+            <Image
+              src={profile.avatar_url}
+              alt={displayName}
+              width={64}
+              height={64}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            initials
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <h1
@@ -70,7 +79,6 @@ export default async function ProfilePage() {
           {profile?.location && (
             <p className="mt-1 text-xs text-muted">{profile.location}</p>
           )}
-          {/* Skills */}
           {profile?.skills?.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {profile.skills.map((s: string) => (
@@ -84,9 +92,11 @@ export default async function ProfilePage() {
             </div>
           )}
         </div>
-        <div className="text-xs text-muted text-right shrink-0">
-          {user.email}
-        </div>
+        {profile?.full_name && (
+          <div className="text-xs text-muted text-right shrink-0">
+            {profile.full_name}
+          </div>
+        )}
       </section>
 
       {/* ── My Projects ── */}
@@ -200,6 +210,15 @@ export default async function ProfilePage() {
         <form action={saveProfile} className="flex flex-col gap-6">
           {/* Basic info */}
           <div className="rounded-xl border border-border bg-surface p-6">
+            {/* Avatar */}
+            <div className="mb-6 flex flex-col items-center gap-1">
+              <AvatarUpload
+                userId={user.id}
+                currentUrl={profile?.avatar_url ?? null}
+                initials={initials}
+              />
+            </div>
+
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Full name" name="full_name" defaultValue={profile?.full_name ?? ""} placeholder="Maya Chen" />
               <Field label="Username" name="username" defaultValue={profile?.username ?? ""} placeholder="mayachen" />
