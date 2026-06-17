@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin } from "lucide-react";
 import { type DbBuilder } from "@/lib/types";
 import { SunMark } from "@/components/ui/sun-mark";
@@ -23,10 +24,14 @@ export function PeopleCard({ builder }: { builder: DbBuilder }) {
 
         <div className="mb-4 flex items-start gap-3">
           <div
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+            className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white overflow-hidden"
             style={{ backgroundColor: avatarColor }}
           >
-            {initials}
+            {builder.avatar_url ? (
+              <Image src={builder.avatar_url} alt={displayName} fill className="object-cover" unoptimized />
+            ) : (
+              initials
+            )}
           </div>
 
           <div className="min-w-0 flex-1">

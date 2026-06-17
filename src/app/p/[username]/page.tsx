@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { type SocialLinks } from "@/lib/mock-data";
 import { notFound } from "next/navigation";
 import { MapPin } from "lucide-react";
+import Image from "next/image";
 
 export default function PublicProfilePage({
   params,
@@ -49,12 +50,16 @@ async function ProfileContent({
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       {/* Profile header */}
-      <div className="mb-8 flex items-start gap-5">
+      <div className="mb-8 flex items-start gap-4 sm:gap-5">
         <div
-          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full text-2xl font-bold text-white"
+          className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full text-2xl font-bold text-white overflow-hidden"
           style={{ backgroundColor: color }}
         >
-          {initials}
+          {profile.avatar_url ? (
+            <Image src={profile.avatar_url} alt={name} fill className="object-cover" unoptimized />
+          ) : (
+            initials
+          )}
         </div>
 
         <div className="flex-1">

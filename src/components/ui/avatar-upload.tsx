@@ -1,115 +1,140 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
+import { useRef, useState } from "react";
 import Image from "next/image";
-import { type ChangeEvent, useRef, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 interface AvatarUploadProps {
   userId: string;
-  currentUrl?: string | null;
+  currentUrl: string | null;
   initials: string;
 }
 
 export function AvatarUpload({ userId, currentUrl, initials }: AvatarUploadProps) {
-  const [preview, setPreview] = useState<string | null>(currentUrl ?? null);
-  const [avatarUrl, setAvatarUrl] = useState(currentUrl ?? "");
+  const [preview, setPreview]   = useState<string | null>(currentUrl);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError]       = useState<string | null>(null);
+  const [savedUrl, setSavedUrl] = useState<string | null>(currentUrl);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!["image/jpeg", "image/png"].includes(file.type)) {
-      setError("Only JPEG and PNG images are accepted.");
+  async function handleFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      setError("Please pick an image file.");
       return;
     }
-
-    if (file.size > 2 * 1024 * 1024) {
-      setError("Image must be under 2 MB.");
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image must be under 5 MB.");
       return;
     }
 
     setError(null);
     setUploading(true);
 
+    // Show local preview immediately
+    const objectUrl = URL.createObjectURL(file);
+    setPreview(objectUrl);
+
     const supabase = createClient();
-    const ext = file.type === "image/png" ? "png" : "jpg";
-    const path = `${userId}/avatar.${ext}`;
+    const ext      = file.name.split(".").pop() ?? "jpg";
+    const path     = `${userId}/avatar.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from("avatars")
       .upload(path, file, { upsert: true, contentType: file.type });
 
     if (uploadError) {
-      setError(uploadError.message);
+      setError("Upload failed. " + uploadError.message);
+      setPreview(currentUrl);
       setUploading(false);
       return;
     }
 
     const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-    // Cache-bust so the browser shows the new image immediately
-    const fresh = `${data.publicUrl}?t=${Date.now()}`;
-    setPreview(fresh);
-    setAvatarUrl(data.publicUrl);
+    // Bust cache with timestamp
+    const publicUrl = data.publicUrl + `?t=${Date.now()}`;
+    setSavedUrl(publicUrl);
+    setPreview(publicUrl);
     setUploading(false);
   }
 
+  function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+  }
+
+  function onDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFile(file);
+  }
+
   return (
-    <div className="flex flex-col items-center gap-2">
-      <button
-        type="button"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={uploading}
-        aria-label="Change avatar"
-        className="relative group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal rounded-full"
+    <div className="flex items-center gap-5">
+      {/* Hidden input carries the URL into the form */}
+      <input type="hidden" name="avatar_url" value={savedUrl ?? ""} />
+
+      {/* Avatar circle — click or drop to change */}
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label="Upload avatar"
+        onClick={() => inputRef.current?.click()}
+        onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
+        onDrop={onDrop}
+        onDragOver={(e) => e.preventDefault()}
+        className="relative flex h-20 w-20 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-border bg-cream transition-colors hover:border-teal group"
       >
-        <div className="h-20 w-20 rounded-full overflow-hidden flex items-center justify-center bg-teal text-white text-2xl font-bold shrink-0">
-          {preview ? (
-            <Image
-              src={preview}
-              alt="Avatar"
-              width={80}
-              height={80}
-              className="h-full w-full object-cover"
-              unoptimized={preview.includes("?t=")}
-            />
-          ) : (
-            initials
-          )}
-        </div>
+        {preview ? (
+          <Image
+            src={preview}
+            alt="Avatar"
+            fill
+            className="object-cover"
+            unoptimized
+          />
+        ) : (
+          <span className="text-2xl font-bold text-teal-deep">{initials}</span>
+        )}
 
-        <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 flex items-center justify-center transition-opacity pointer-events-none">
+        {/* Hover overlay */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-teal-deep/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
           {uploading ? (
-            <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z" />
-            </svg>
+            <span className="text-white text-xs animate-pulse">Uploading…</span>
           ) : (
-            <svg className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-            </svg>
+            <>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span className="text-white text-[10px] mt-1 font-medium">Change</span>
+            </>
           )}
         </div>
-      </button>
+      </div>
 
-      <p className="text-xs text-muted">JPEG or PNG · max 2 MB</p>
-
-      {error && (
-        <p className="text-xs text-red-500">{error}</p>
-      )}
-
-      {/* Hidden field carries the URL into the server action via FormData */}
-      <input type="hidden" name="avatar_url" value={avatarUrl} readOnly />
-
+      {/* Hidden file input */}
       <input
-        ref={fileInputRef}
+        ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png"
-        className="hidden"
-        onChange={handleFileChange}
+        accept="image/*"
+        className="sr-only"
+        onChange={onInputChange}
       />
+
+      {/* Info text */}
+      <div>
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="text-sm font-medium text-teal hover:text-teal-dark transition-colors"
+        >
+          {preview ? "Change photo" : "Upload photo"}
+        </button>
+        <p className="text-xs text-muted mt-0.5">JPG, PNG or WebP · Max 5 MB</p>
+        {error && <p className="text-xs text-orange mt-1">{error}</p>}
+        {uploading && <p className="text-xs text-teal mt-1 animate-pulse">Uploading…</p>}
+      </div>
     </div>
   );
 }

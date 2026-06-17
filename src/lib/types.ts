@@ -12,6 +12,7 @@ export type DbProject = {
   profiles: {
     username: string;
     full_name: string | null;
+    avatar_url: string | null;
   } | null;
 };
 
@@ -23,4 +24,5 @@ export type DbBuilder = {
   bio: string | null;
   location: string | null;
   skills: string[];
+  avatar_url: string | null;
 };

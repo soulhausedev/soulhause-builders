@@ -22,7 +22,7 @@ export default function LoginPage({
             <span className="text-orange">in</span>
           </h1>
           <p className="mb-6 text-sm text-muted">
-            Join Soulbuilders and start sharing your projects.
+            Join Soulhause Builders and start sharing your projects.
           </p>
 
           <ErrorMessage searchParams={searchParams} />

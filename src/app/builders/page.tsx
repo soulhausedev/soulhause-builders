@@ -21,7 +21,7 @@ async function BuildersContent({
 
   let query = supabase
     .from("profiles")
-    .select("id, username, full_name, role, bio, location, skills")
+    .select("id, username, full_name, role, bio, location, skills, avatar_url")
     .not("username", "is", null)
     .order("updated_at", { ascending: false });
 
