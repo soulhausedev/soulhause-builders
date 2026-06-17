@@ -13,14 +13,14 @@ export async function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-cream transition-colors duration-200">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="Soulbuilders" width={52} height={52} />
+        <Link href="https://soulhausebuilders.com" className="flex items-center gap-2">
+          <Image src="/logo.png" alt="Soulhause Builders" width={52} height={52} />
           <span
             className="text-2xl leading-none tracking-tight"
             style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
           >
-            <span className="text-teal-deep">Soul</span>
-            <span className="text-orange">builders</span>
+            <span className="text-teal-deep">Soulhause</span>
+            <span className="text-orange"> Builders</span>
           </span>
         </Link>
 
