@@ -74,7 +74,7 @@ export function ProjectCard({ project }: { project: DbProject }) {
 
         {/* Footer */}
         <div className="flex items-center justify-between border-t border-border pt-4">
-          <Link href={`/p/${authorUsername}`} className="flex items-center gap-2 text-sm text-muted hover:text-teal">
+          <Link href={`/${authorUsername}`} className="flex items-center gap-2 text-sm text-muted hover:text-teal">
             <div
               className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white"
               style={{ backgroundColor: avatarColor }}

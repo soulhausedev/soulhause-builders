@@ -65,7 +65,7 @@ export default async function ProfilePage() {
           {profile?.username && (
             <p className="text-sm text-muted mt-0.5">
               @{profile.username} ·{" "}
-              <Link href={`/p/${profile.username}`} className="text-teal hover:underline">
+              <Link href={`/${profile.username}`} className="text-teal hover:underline">
                 view public profile →
               </Link>
             </p>

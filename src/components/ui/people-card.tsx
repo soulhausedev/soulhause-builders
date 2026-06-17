@@ -17,7 +17,7 @@ export function PeopleCard({ builder }: { builder: DbBuilder }) {
   const avatarColor = colorForUsername(builder.username);
 
   return (
-    <Link href={`/p/${builder.username}`} className="group block">
+    <Link href={`/${builder.username}`} className="group block">
       <div className="relative h-full overflow-hidden rounded-xl border border-border bg-surface p-5 shadow-sm transition-all duration-200 group-hover:border-teal group-hover:shadow-md">
         <SunMark size={110} opacity={0.06} color="#E8703A" className="absolute -bottom-4 -right-4" />
 

@@ -159,7 +159,7 @@ export default async function LeaderboardPage() {
                         <p className="text-xs text-muted mt-0.5">
                           by{" "}
                           <Link
-                            href={`/p/${author.username}`}
+                            href={`/${author.username}`}
                             className="hover:text-teal transition-colors"
                           >
                             {author.full_name || author.username}

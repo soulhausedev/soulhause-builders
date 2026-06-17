@@ -44,7 +44,7 @@ export async function saveProfile(formData: FormData) {
 
   const username = updates.username;
   if (username) {
-    redirect(`/p/${username}`);
+    redirect(`/${username}`);
   }
 
   redirect("/profile");

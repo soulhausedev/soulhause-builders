@@ -116,7 +116,7 @@ export default async function HomePage() {
                 <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted">
                   <span>
                     by{" "}
-                    <Link href={`/p/${topThis.profile?.username}`} className="font-medium text-teal hover:text-teal-dark">
+                    <Link href={`/${topThis.profile?.username}`} className="font-medium text-teal hover:text-teal-dark">
                       {topThis.profile?.full_name || topThis.profile?.username}
                     </Link>
                   </span>
