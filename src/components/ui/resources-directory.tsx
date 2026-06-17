@@ -18,27 +18,48 @@ function pill(active: boolean) {
 export function ResourcesDirectory({ resources }: { resources: Resource[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
+  const [tag, setTag] = useState("");
+
+  // Tags available within the selected category
+  const availableTags = useMemo(() => {
+    const pool = category
+      ? resources.filter((r) => r.category === category)
+      : [];
+    const tags = new Set<string>();
+    pool.forEach((r) => r.tags.forEach((t) => tags.add(t)));
+    return [...tags].sort();
+  }, [resources, category]);
+
+  const showTagFilters = category !== "" && availableTags.length > 0;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return resources.filter((r) => {
-      const matchesCategory = !category || r.category === category;
-      if (!matchesCategory) return false;
+      if (category && r.category !== category) return false;
+      if (tag && !r.tags.includes(tag)) return false;
       if (!q) return true;
       return (
         r.name.toLowerCase().includes(q) ||
         r.description.toLowerCase().includes(q) ||
         r.category.toLowerCase().includes(q) ||
+        r.tags.some((t) => t.toLowerCase().includes(q)) ||
         formatUrl(r.url).toLowerCase().includes(q)
       );
     });
-  }, [resources, query, category]);
+  }, [resources, query, category, tag]);
 
-  const hasFilter = query.trim() !== "" || category !== "";
+  const hasFilter = query.trim() !== "" || category !== "" || tag !== "";
 
   function clearFilters() {
     setQuery("");
     setCategory("");
+    setTag("");
+  }
+
+  function selectCategory(label: string) {
+    const next = category === label ? "" : label;
+    setCategory(next);
+    setTag("");
   }
 
   return (
@@ -80,15 +101,15 @@ export function ResourcesDirectory({ resources }: { resources: Resource[] }) {
       </div>
 
       {/* Category filters */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        <button type="button" onClick={() => setCategory("")} className={pill(!category)}>
+      <div className="mb-4 flex flex-wrap gap-2">
+        <button type="button" onClick={() => selectCategory("")} className={pill(!category)}>
           All
         </button>
         {RESOURCE_CATEGORIES.map(({ label, emoji }) => (
           <button
             key={label}
             type="button"
-            onClick={() => setCategory(category === label ? "" : label)}
+            onClick={() => selectCategory(label)}
             className={pill(category === label)}
           >
             {emoji} {label}
@@ -96,10 +117,30 @@ export function ResourcesDirectory({ resources }: { resources: Resource[] }) {
         ))}
       </div>
 
+      {/* Tag filters — shown when a category is selected */}
+      {showTagFilters && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          <button type="button" onClick={() => setTag("")} className={pill(!tag)}>
+            All tags
+          </button>
+          {availableTags.map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTag(tag === t ? "" : t)}
+              className={pill(tag === t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Result count */}
       <p className="mb-4 text-sm text-muted">
         {filtered.length} resource{filtered.length !== 1 ? "s" : ""}
         {category ? ` in ${category}` : ""}
+        {tag ? ` · ${tag}` : ""}
         {query.trim() ? ` matching "${query.trim()}"` : ""}
       </p>
 
@@ -112,16 +153,27 @@ export function ResourcesDirectory({ resources }: { resources: Resource[] }) {
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex flex-col gap-1.5 rounded-xl border border-border bg-surface p-4 transition-all hover:border-teal hover:shadow-sm"
+              className="group flex flex-col gap-2 rounded-xl border border-border bg-surface p-4 transition-all hover:border-teal hover:shadow-sm"
             >
-              <div className="flex items-start justify-between gap-2">
-                <p className="font-semibold text-teal-deep group-hover:text-teal transition-colors leading-snug">
-                  {item.name}
-                </p>
-                <span className="shrink-0 rounded-full border border-border bg-cream px-2 py-0.5 text-[10px] font-medium text-muted">
+              <p className="font-semibold text-teal-deep group-hover:text-teal transition-colors leading-snug">
+                {item.name}
+              </p>
+
+              {/* Category + tags on card */}
+              <div className="flex flex-wrap gap-1.5">
+                <span className="rounded-full border border-border bg-cream px-2 py-0.5 text-[10px] font-medium text-muted">
                   {item.categoryEmoji} {item.category}
                 </span>
+                {item.tags.map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-full border border-teal/20 bg-teal/10 px-2 py-0.5 text-[10px] font-medium text-teal-deep"
+                  >
+                    {t}
+                  </span>
+                ))}
               </div>
+
               <p className="text-xs text-muted leading-relaxed line-clamp-2">{item.description}</p>
               <p className="mt-auto text-xs font-medium text-orange group-hover:underline truncate">
                 {formatUrl(item.url)} ↗
@@ -132,7 +184,7 @@ export function ResourcesDirectory({ resources }: { resources: Resource[] }) {
       ) : (
         <div className="rounded-xl border border-dashed border-border bg-surface py-16 text-center">
           <p className="text-sm font-medium text-teal-deep">No resources found</p>
-          <p className="mt-1 text-xs text-muted">Try a different search or category.</p>
+          <p className="mt-1 text-xs text-muted">Try a different search or filter.</p>
           {hasFilter && (
             <button
               type="button"
