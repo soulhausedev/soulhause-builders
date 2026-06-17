@@ -7,10 +7,13 @@ import { headers } from "next/headers";
 export async function signInWithGoogle() {
   const supabase = await createClient();
   const headersList = await headers();
-  const origin =
-    headersList.get("origin") ??
+  // Prefer the explicit env var so production always uses the canonical domain,
+  // not whatever Vercel deployment URL the request arrived on.
+  const origin = (
     process.env.NEXT_PUBLIC_SITE_URL ??
-    (() => { throw new Error("NEXT_PUBLIC_SITE_URL is not set"); })();
+    headersList.get("origin") ??
+    (() => { throw new Error("NEXT_PUBLIC_SITE_URL is not set"); })()
+  ).replace(/\/$/, "");
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
