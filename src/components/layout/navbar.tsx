@@ -16,10 +16,15 @@ export async function Navbar() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div style={{ backgroundColor: "#F5F0E6" }} className="rounded-lg overflow-hidden shrink-0">
-            <Image src="/logo.png" alt="Soulhause Builders" width={44} height={44} />
-          </div>
+        <Link href="/" className="flex items-center gap-2.5 shrink-0">
+          <Image
+            src="/logo.png"
+            alt="Soulhause Builders"
+            width={48}
+            height={48}
+            priority
+            className="h-11 w-11 object-contain"
+          />
           <span
             className="text-xl leading-none tracking-tight"
             style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}

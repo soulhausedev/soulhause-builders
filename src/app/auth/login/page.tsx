@@ -1,4 +1,5 @@
 import { signInWithGoogle } from "./actions";
+import Image from "next/image";
 
 export default function LoginPage({
   searchParams,
@@ -8,10 +9,20 @@ export default function LoginPage({
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        <div
-          className="mb-6 h-1 w-12 rounded-full"
-          style={{ background: "linear-gradient(90deg, #F5C432, #E8703A, #C45525)" }}
-        />
+        <div className="mb-6 flex flex-col items-center text-center">
+          <Image
+            src="/logo.png"
+            alt="Soulhause Builders"
+            width={72}
+            height={72}
+            priority
+            className="mb-4 h-16 w-16 object-contain"
+          />
+          <div
+            className="h-1 w-12 rounded-full"
+            style={{ background: "linear-gradient(90deg, #F5C432, #E8703A, #C45525)" }}
+          />
+        </div>
 
         <div className="rounded-xl border border-border bg-surface p-8 shadow-sm">
           <h1
