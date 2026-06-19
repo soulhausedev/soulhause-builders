@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { CATEGORIES } from "@/lib/mock-data";
 import { FormAlert } from "@/components/ui/form-alert";
+import { DeleteProjectButton } from "@/components/ui/delete-project-button";
 import { updateProject } from "./actions";
 
 const PROJECT_TYPE_OPTIONS = [
@@ -175,12 +176,19 @@ export default async function EditProjectPage({
           <a href="/profile" className="text-sm text-muted hover:text-teal">
             ← Back to profile
           </a>
-          <button
-            type="submit"
-            className="rounded-lg bg-orange px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-terra"
-          >
-            Save changes
-          </button>
+          <div className="flex items-center gap-3">
+            <DeleteProjectButton
+              projectId={id}
+              projectTitle={project.title}
+              variant="button"
+            />
+            <button
+              type="submit"
+              className="rounded-lg bg-orange px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-terra"
+            >
+              Save changes
+            </button>
+          </div>
         </div>
       </form>
     </div>

@@ -57,3 +57,39 @@ export async function updateProject(formData: FormData) {
 
   redirect("/profile");
 }
+
+export async function deleteProject(formData: FormData) {
+  const projectId = formData.get("project_id") as string;
+  if (!projectId) redirect("/profile?error=" + encodeURIComponent("Missing project ID."));
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/auth/login");
+
+  const { data: existing } = await supabase
+    .from("projects")
+    .select("user_id")
+    .eq("id", projectId)
+    .single();
+
+  if (!existing || existing.user_id !== user.id) {
+    redirect("/profile?error=" + encodeURIComponent("You can only delete your own projects."));
+  }
+
+  await supabase.from("votes").delete().eq("project_id", projectId);
+
+  const { error } = await supabase
+    .from("projects")
+    .delete()
+    .eq("id", projectId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    redirect("/profile?error=" + encodeURIComponent(error.message));
+  }
+
+  redirect("/profile");
+}

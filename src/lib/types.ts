@@ -25,4 +25,5 @@ export type DbBuilder = {
   location: string | null;
   skills: string[];
   avatar_url: string | null;
+  profile_theme?: string | null;
 };

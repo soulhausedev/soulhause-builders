@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { validateUrl } from "@/lib/validate-url";
+import { DEFAULT_PROFILE_THEME, isValidProfileThemeKey } from "@/lib/profile-themes";
 import { redirect } from "next/navigation";
 
 export async function saveProfile(formData: FormData) {
@@ -18,6 +19,9 @@ export async function saveProfile(formData: FormData) {
 
   const avatar_url = (formData.get("avatar_url") as string) || null;
 
+  const themeRaw = formData.get("profile_theme") as string;
+  const profile_theme = isValidProfileThemeKey(themeRaw) ? themeRaw : DEFAULT_PROFILE_THEME;
+
   const updates = {
     id:         user.id,
     full_name:  formData.get("full_name")  as string,
@@ -33,6 +37,7 @@ export async function saveProfile(formData: FormData) {
     instagram:  formData.get("instagram")  as string,
     youtube:    formData.get("youtube")    as string,
     avatar_url,
+    profile_theme,
     updated_at: new Date().toISOString(),
   };
 

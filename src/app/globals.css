@@ -49,3 +49,56 @@ body {
   background-image: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
   background-size: 24px 24px;
 }
+
+/* ─── Profile themes (scoped to public profile) ─────────────────────────── */
+.profile-themed {
+  background: var(--pt-bg);
+  color: var(--pt-text);
+}
+
+.profile-themed .profile-heading {
+  color: var(--pt-text);
+}
+
+.profile-themed .profile-muted {
+  color: var(--pt-text-muted);
+}
+
+.profile-themed .profile-accent {
+  color: var(--pt-accent);
+}
+
+.profile-themed .profile-accent-secondary {
+  color: var(--pt-accent-secondary);
+}
+
+.profile-themed .profile-card {
+  background: var(--pt-card);
+  border-color: var(--pt-border);
+  border-radius: var(--pt-radius);
+}
+
+.profile-themed .profile-tag {
+  background: var(--pt-tag-bg);
+  border-color: var(--pt-border);
+  color: var(--pt-text);
+}
+
+.profile-themed .profile-social {
+  background: var(--pt-card);
+  border-color: var(--pt-border);
+  color: var(--pt-text-muted);
+}
+
+.profile-themed .profile-social:hover {
+  border-color: var(--pt-accent-secondary);
+  color: var(--pt-accent-secondary);
+}
+
+.profile-themed .profile-link {
+  color: var(--pt-accent-secondary);
+}
+
+.profile-themed .profile-link:hover {
+  color: var(--pt-accent);
+}

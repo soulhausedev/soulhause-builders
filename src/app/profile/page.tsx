@@ -3,9 +3,11 @@ import { redirect } from "next/navigation";
 import { ROLES } from "@/lib/mock-data";
 import { saveProfile } from "./actions";
 import { AvatarUpload } from "@/components/ui/avatar-upload";
+import { DeleteProjectButton } from "@/components/ui/delete-project-button";
 import { FormAlert } from "@/components/ui/form-alert";
 import { ProjectTypeBadges, categoryTags } from "@/components/ui/project-type-badges";
 import { SkillsPicker } from "@/components/ui/skills-picker";
+import { ThemePicker } from "@/components/ui/theme-picker";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -157,12 +159,18 @@ export default async function ProfilePage({
               >
                 <div className="flex items-start justify-between gap-2">
                   <p className="font-semibold text-teal-deep leading-snug">{project.title}</p>
-                  <Link
-                    href={`/projects/${project.id}/edit`}
-                    className="text-xs text-muted hover:text-teal shrink-0"
-                  >
-                    Edit
-                  </Link>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <Link
+                      href={`/projects/${project.id}/edit`}
+                      className="text-xs text-muted hover:text-teal"
+                    >
+                      Edit
+                    </Link>
+                    <DeleteProjectButton
+                      projectId={project.id}
+                      projectTitle={project.title}
+                    />
+                  </div>
                 </div>
                 <ProjectTypeBadges types={project.project_type} />
                 <p className="text-xs text-muted line-clamp-2">{project.description}</p>
@@ -265,6 +273,15 @@ export default async function ProfilePage({
               <Field label="Instagram handle" name="instagram" defaultValue={profile?.instagram ?? ""} placeholder="yourusername" />
               <Field label="YouTube handle" name="youtube" defaultValue={profile?.youtube ?? ""} placeholder="yourusername" />
             </div>
+          </div>
+
+          {/* Profile theme */}
+          <div className="rounded-xl border border-border bg-surface p-6">
+            <p className="mb-1 text-sm font-semibold text-teal-deep">Profile theme</p>
+            <p className="mb-4 text-xs text-muted">
+              Pick a vibe for your public profile — personality, interests, or culture.
+            </p>
+            <ThemePicker defaultTheme={profile?.profile_theme} />
           </div>
 
           <div className="flex justify-end">

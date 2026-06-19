@@ -1,7 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { type SocialLinks } from "@/lib/mock-data";
+import { getProfileTheme } from "@/lib/profile-themes";
 import { notFound } from "next/navigation";
 import { ProjectTypeBadges, categoryTags } from "@/components/ui/project-type-badges";
+import { ProfileThemeShell } from "@/components/ui/profile-theme-shell";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -71,9 +73,9 @@ async function ProfileContent({
     .eq("user_id", profile.id)
     .order("created_at", { ascending: false });
 
-  const name     = profile.full_name || username;
+  const theme = getProfileTheme(profile.profile_theme);
+  const name = profile.full_name || username;
   const initials = name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2);
-  const color    = "#4F9080";
 
   const social: SocialLinks = {
     website:   profile.website   || undefined,
@@ -85,116 +87,120 @@ async function ProfileContent({
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
-      {/* Profile header */}
-      <div className="mb-8 flex items-start gap-5">
-        <div
-          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full overflow-hidden text-2xl font-bold text-white"
-          style={{ backgroundColor: color }}
-        >
-          {profile.avatar_url ? (
-            <Image
-              src={profile.avatar_url}
-              alt={name}
-              width={80}
-              height={80}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            initials
-          )}
-        </div>
-
-        <div className="flex-1">
-          <h1
-            className="text-3xl"
-            style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
+    <ProfileThemeShell themeKey={profile.profile_theme}>
+      <div className="mx-auto max-w-4xl px-4 py-12">
+        <div className="mb-8 flex items-start gap-5">
+          <div
+            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full overflow-hidden text-2xl font-bold text-white"
+            style={{ backgroundColor: theme.avatarFallback }}
           >
-            <span className="text-teal-deep">{name}</span>
-          </h1>
-          <p className="text-sm text-muted">@{username}</p>
-
-          <div className="mt-2 flex flex-wrap items-center gap-3">
-            {profile.role && (
-              <span className="text-sm font-medium text-orange">{profile.role}</span>
-            )}
-            {profile.location && (
-              <span className="flex items-center gap-1 text-xs text-muted">
-                <MapPin size={11} /> {profile.location}
-              </span>
+            {profile.avatar_url ? (
+              <Image
+                src={profile.avatar_url}
+                alt={name}
+                width={80}
+                height={80}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              initials
             )}
           </div>
 
-          {profile.bio && (
-            <p className="mt-3 max-w-xl text-sm text-muted">{profile.bio}</p>
-          )}
+          <div className="flex-1">
+            <h1
+              className="profile-heading text-3xl"
+              style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
+            >
+              {name}
+            </h1>
+            <p className="profile-muted text-sm">@{username}</p>
 
-          {/* Skills */}
-          {profile.skills?.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {profile.skills.map((skill: string) => (
-                <span
-                  key={skill}
-                  className="rounded-full border border-border bg-cream px-2.5 py-0.5 text-xs font-medium text-muted"
-                >
-                  {skill}
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              {profile.role && (
+                <span className="profile-accent text-sm font-medium">{profile.role}</span>
+              )}
+              {profile.location && (
+                <span className="profile-muted flex items-center gap-1 text-xs">
+                  <MapPin size={11} /> {profile.location}
                 </span>
+              )}
+            </div>
+
+            {profile.bio && (
+              <p className="profile-muted mt-3 max-w-xl text-sm">{profile.bio}</p>
+            )}
+
+            {profile.skills?.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {profile.skills.map((skill: string) => (
+                  <span
+                    key={skill}
+                    className="profile-tag rounded-full border px-2.5 py-0.5 text-xs font-medium"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <SocialBar social={social} />
+          </div>
+        </div>
+
+        {projects && projects.length > 0 ? (
+          <>
+            <h2 className="profile-heading mb-5 text-lg font-semibold">
+              Projects · {projects.length}
+            </h2>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {projects.map((project: {
+                id: string;
+                title: string;
+                description: string;
+                tags: string[];
+                project_type: string[];
+                link_url: string;
+                link_label: string;
+              }) => (
+                <div
+                  key={project.id}
+                  className="profile-card flex flex-col gap-2 border p-5"
+                >
+                  <p className="profile-heading font-semibold">{project.title}</p>
+                  <ProjectTypeBadges types={project.project_type} />
+                  <p className="profile-muted text-sm leading-relaxed">{project.description}</p>
+                  {categoryTags(project.tags).length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {categoryTags(project.tags).map((t: string) => (
+                        <span
+                          key={t}
+                          className="profile-tag rounded-full px-2.5 py-0.5 text-xs"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {project.link_url && (
+                    <a
+                      href={project.link_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="profile-link mt-auto text-xs font-medium hover:underline"
+                    >
+                      {project.link_label || "View project"} ↗
+                    </a>
+                  )}
+                </div>
               ))}
             </div>
-          )}
-
-          {/* Social links */}
-          <SocialBar social={social} />
-        </div>
+          </>
+        ) : (
+          <p className="profile-muted text-sm">No projects posted yet.</p>
+        )}
       </div>
-
-      {/* Projects */}
-      {projects && projects.length > 0 ? (
-        <>
-          <h2 className="mb-5 text-lg font-semibold text-teal-deep">
-            Projects · {projects.length}
-          </h2>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {projects.map((project: {
-              id: string;
-              title: string;
-              description: string;
-              tags: string[];
-              project_type: string[];
-              link_url: string;
-              link_label: string;
-            }) => (
-              <div key={project.id} className="rounded-xl border border-border bg-surface p-5 flex flex-col gap-2">
-                <p className="font-semibold text-teal-deep">{project.title}</p>
-                <ProjectTypeBadges types={project.project_type} />
-                <p className="text-sm text-muted leading-relaxed">{project.description}</p>
-                {categoryTags(project.tags).length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {categoryTags(project.tags).map((t: string) => (
-                      <span key={t} className="rounded-full bg-teal-pale px-2.5 py-0.5 text-xs text-teal-deep">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {project.link_url && (
-                  <a
-                    href={project.link_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-auto text-xs font-medium text-teal hover:underline"
-                  >
-                    {project.link_label || "View project"} ↗
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </>
-      ) : (
-        <p className="text-sm text-muted">No projects posted yet.</p>
-      )}
-    </div>
+    </ProfileThemeShell>
   );
 }
 
@@ -235,7 +241,7 @@ function SocialBar({ social }: { social: SocialLinks }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={l.label}
-          className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:border-teal hover:text-teal"
+          className="profile-social flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
         >
           <SocialIcon type={l.key} />
           {l.label}
