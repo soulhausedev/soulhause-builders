@@ -91,7 +91,7 @@ async function ProfileContent({
       <div className="mx-auto max-w-4xl px-4 py-12">
         <div className="mb-8 flex items-start gap-5">
           <div
-            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full overflow-hidden text-2xl font-bold text-white"
+            className="profile-avatar flex h-20 w-20 shrink-0 items-center justify-center rounded-full overflow-hidden text-2xl font-bold text-white"
             style={{ backgroundColor: theme.avatarFallback }}
           >
             {profile.avatar_url ? (

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { validateUrl } from "@/lib/validate-url";
 import { DEFAULT_PROFILE_THEME, isValidProfileThemeKey } from "@/lib/profile-themes";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function saveProfile(formData: FormData) {
@@ -48,12 +49,14 @@ export async function saveProfile(formData: FormData) {
     redirect("/profile?error=" + encodeURIComponent(error.message));
   }
 
-  const username = updates.username;
-  if (username) {
-    redirect("/profile?saved=1");
-  }
-
   redirect("/profile?saved=1");
+}
+
+function revalidatePublicLists() {
+  revalidatePath("/");
+  revalidatePath("/builders");
+  revalidatePath("/directory");
+  revalidatePath("/leaderboard");
 }
 
 export async function deleteProfile() {
@@ -64,38 +67,89 @@ export async function deleteProfile() {
 
   if (!user) redirect("/auth/login");
 
-  const { data: projects } = await supabase
+  const admin = createAdminClient();
+  const db = admin ?? supabase;
+  const userId = user.id;
+
+  const { data: projects, error: projectsReadError } = await db
     .from("projects")
     .select("id")
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
+
+  if (projectsReadError) {
+    redirect("/profile?error=" + encodeURIComponent(projectsReadError.message));
+  }
 
   const projectIds = (projects ?? []).map((p) => p.id);
 
   if (projectIds.length > 0) {
-    await supabase.from("votes").delete().in("project_id", projectIds);
+    const { error: votesError } = await db.from("votes").delete().in("project_id", projectIds);
+    if (votesError) {
+      redirect("/profile?error=" + encodeURIComponent(votesError.message));
+    }
   }
 
-  await supabase.from("votes").delete().eq("user_id", user.id);
-  await supabase.from("projects").delete().eq("user_id", user.id);
+  const { error: userVotesError } = await db.from("votes").delete().eq("user_id", userId);
+  if (userVotesError) {
+    redirect("/profile?error=" + encodeURIComponent(userVotesError.message));
+  }
 
-  const { data: avatarFiles } = await supabase.storage.from("avatars").list(user.id);
+  const { data: deletedProjects, error: projectsError } = await db
+    .from("projects")
+    .delete()
+    .eq("user_id", userId)
+    .select("id");
+
+  if (projectsError) {
+    redirect("/profile?error=" + encodeURIComponent(projectsError.message));
+  }
+
+  if (projectIds.length > 0 && !deletedProjects?.length && !admin) {
+    redirect(
+      "/profile?error=" +
+        encodeURIComponent("Could not delete your projects. Check Supabase delete policies.")
+    );
+  }
+
+  const { data: avatarFiles } = await db.storage.from("avatars").list(userId);
   if (avatarFiles?.length) {
-    await supabase.storage
+    const { error: storageError } = await db.storage
       .from("avatars")
-      .remove(avatarFiles.map((f) => `${user.id}/${f.name}`));
+      .remove(avatarFiles.map((f) => `${userId}/${f.name}`));
+    if (storageError) {
+      redirect("/profile?error=" + encodeURIComponent(storageError.message));
+    }
   }
 
-  const { error: profileError } = await supabase.from("profiles").delete().eq("id", user.id);
+  const { data: deletedProfile, error: profileError } = await db
+    .from("profiles")
+    .delete()
+    .eq("id", userId)
+    .select("id");
 
   if (profileError) {
     redirect("/profile?error=" + encodeURIComponent(profileError.message));
   }
 
-  const admin = createAdminClient();
+  if (!deletedProfile?.length) {
+    redirect(
+      "/profile?error=" +
+        encodeURIComponent(
+          admin
+            ? "Profile could not be deleted. It may already be removed."
+            : "Could not delete your profile. Add SUPABASE_SERVICE_ROLE_KEY to Vercel or run scripts/profile-delete-policies.sql in Supabase."
+        )
+    );
+  }
+
   if (admin) {
-    await admin.auth.admin.deleteUser(user.id);
+    const { error: authError } = await admin.auth.admin.deleteUser(userId);
+    if (authError) {
+      redirect("/profile?error=" + encodeURIComponent(authError.message));
+    }
   }
 
   await supabase.auth.signOut();
+  revalidatePublicLists();
   redirect("/");
 }

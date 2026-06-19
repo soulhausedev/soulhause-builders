@@ -65,7 +65,7 @@ export default async function ProfilePage({
       <ProfileThemeShell themeKey={profile?.profile_theme}>
         <section className="profile-card rounded-2xl border p-4 sm:p-6 flex items-start gap-4 sm:gap-5">
           <div
-            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full overflow-hidden text-2xl font-bold text-white"
+            className="profile-avatar flex h-16 w-16 shrink-0 items-center justify-center rounded-full overflow-hidden text-2xl font-bold text-white"
             style={{ backgroundColor: theme.avatarFallback }}
           >
             {profile?.avatar_url ? (

@@ -252,6 +252,7 @@ export function themeToCssVars(theme: ProfileTheme): CSSProperties {
     "--pt-radius": theme.radius,
     "--pt-avatar": theme.avatarFallback,
     "--pt-tag-bg": theme.tagBg,
+    "--pt-cream": "#F5F0E6",
   } as CSSProperties;
 }
 

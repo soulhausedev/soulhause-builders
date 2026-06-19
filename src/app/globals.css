@@ -86,31 +86,40 @@ body {
 
 .profile-themed .profile-card {
   background: var(--pt-card);
-  border-color: var(--pt-border);
+  border-color: var(--pt-cream);
   border-radius: var(--pt-radius);
+}
+
+.profile-themed .profile-avatar {
+  box-shadow: 0 0 0 3px var(--pt-cream);
 }
 
 .profile-themed .profile-tag {
   background: var(--pt-tag-bg);
-  border-color: var(--pt-border);
+  border-color: var(--pt-cream);
   color: var(--pt-text);
 }
 
 .profile-themed .profile-social {
   background: var(--pt-card);
-  border-color: var(--pt-border);
+  border: 2px solid var(--pt-cream);
   color: var(--pt-text-muted);
 }
 
 .profile-themed .profile-social:hover {
-  border-color: var(--pt-accent-secondary);
-  color: var(--pt-accent-secondary);
+  border-color: var(--pt-accent);
+  color: var(--pt-accent);
 }
 
 .profile-themed .profile-link {
   color: var(--pt-accent-secondary);
+  text-decoration: underline;
+  text-decoration-color: var(--pt-cream);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 .profile-themed .profile-link:hover {
   color: var(--pt-accent);
+  text-decoration-color: var(--pt-accent);
 }

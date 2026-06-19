@@ -63,7 +63,7 @@ export function ThemePicker({
             <div className="p-5">
               <div className="flex items-start gap-4">
                 <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                  className="profile-avatar flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
                   style={{ backgroundColor: theme.avatarFallback }}
                 >
                   {(preview?.name ?? "You").slice(0, 2).toUpperCase()}
@@ -88,6 +88,17 @@ export function ThemePicker({
                 <p className="profile-muted mt-1 text-xs">
                   This is how your public profile will look.
                 </p>
+                <span className="profile-link mt-2 inline-block text-xs font-medium">
+                  View project ↗
+                </span>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="profile-social inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium">
+                  GitHub
+                </span>
+                <span className="profile-social inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium">
+                  Website
+                </span>
               </div>
             </div>
           </div>
