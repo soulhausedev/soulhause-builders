@@ -3,11 +3,18 @@ import { redirect } from "next/navigation";
 import { ROLES } from "@/lib/mock-data";
 import { saveProfile } from "./actions";
 import { AvatarUpload } from "@/components/ui/avatar-upload";
+import { FormAlert } from "@/components/ui/form-alert";
+import { ProjectTypeBadges, categoryTags } from "@/components/ui/project-type-badges";
 import { SkillsPicker } from "@/components/ui/skills-picker";
 import Image from "next/image";
 import Link from "next/link";
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -39,6 +46,8 @@ export default async function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12 space-y-10 sm:space-y-12">
+
+      {error && <FormAlert message={error} />}
 
       {/* ── Profile summary card ── */}
       <section className="rounded-2xl border border-border bg-surface p-4 sm:p-6 flex items-start gap-4 sm:gap-5">
@@ -155,24 +164,11 @@ export default async function ProfilePage() {
                     Edit
                   </Link>
                 </div>
-                {/* Type badges */}
-                {project.project_type?.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {project.project_type.includes("Free") && (
-                      <span className="rounded-full bg-gold/20 border border-gold/40 px-2 py-0.5 text-xs font-medium text-teal-deep">🆓 Free</span>
-                    )}
-                    {project.project_type.includes("Paid") && (
-                      <span className="rounded-full bg-orange/10 border border-orange/30 px-2 py-0.5 text-xs font-medium text-orange">💰 Paid</span>
-                    )}
-                    {project.project_type.includes("Open Source") && (
-                      <span className="rounded-full bg-teal/10 border border-teal/30 px-2 py-0.5 text-xs font-medium text-teal-deep">🔓 Open Source</span>
-                    )}
-                  </div>
-                )}
+                <ProjectTypeBadges types={project.project_type} />
                 <p className="text-xs text-muted line-clamp-2">{project.description}</p>
-                {project.tags?.filter((t: string) => !["Free","Open Source"].includes(t)).length > 0 && (
+                {categoryTags(project.tags).length > 0 && (
                   <div className="flex flex-wrap gap-1">
-                    {project.tags.filter((t: string) => !["Free","Open Source"].includes(t)).map((t: string) => (
+                    {categoryTags(project.tags).map((t: string) => (
                       <span key={t} className="rounded-full bg-teal-pale px-2 py-0.5 text-xs text-teal-deep">
                         {t}
                       </span>

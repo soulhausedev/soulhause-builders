@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { type SocialLinks } from "@/lib/mock-data";
 import { notFound } from "next/navigation";
+import { ProjectTypeBadges, categoryTags } from "@/components/ui/project-type-badges";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -165,21 +166,11 @@ async function ProfileContent({
             }) => (
               <div key={project.id} className="rounded-xl border border-border bg-surface p-5 flex flex-col gap-2">
                 <p className="font-semibold text-teal-deep">{project.title}</p>
-                {/* Free / Open Source badges */}
-                {project.project_type?.length > 0 && (
-                  <div className="flex gap-1.5">
-                    {project.project_type.includes("Free") && (
-                      <span className="rounded-full bg-gold/20 border border-gold/40 px-2 py-0.5 text-xs font-medium text-teal-deep">🆓 Free</span>
-                    )}
-                    {project.project_type.includes("Open Source") && (
-                      <span className="rounded-full bg-teal/10 border border-teal/30 px-2 py-0.5 text-xs font-medium text-teal-deep">🔓 Open Source</span>
-                    )}
-                  </div>
-                )}
+                <ProjectTypeBadges types={project.project_type} />
                 <p className="text-sm text-muted leading-relaxed">{project.description}</p>
-                {project.tags?.filter((t: string) => !["Free","Open Source"].includes(t)).length > 0 && (
+                {categoryTags(project.tags).length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
-                    {project.tags.filter((t: string) => !["Free","Open Source"].includes(t)).map((t: string) => (
+                    {categoryTags(project.tags).map((t: string) => (
                       <span key={t} className="rounded-full bg-teal-pale px-2.5 py-0.5 text-xs text-teal-deep">
                         {t}
                       </span>

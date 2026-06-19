@@ -1,15 +1,25 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import { CATEGORIES } from "@/lib/mock-data";
 import { FormAlert } from "@/components/ui/form-alert";
-import { addProject } from "./actions";
+import { updateProject } from "./actions";
 
-export default async function NewProjectPage({
+const PROJECT_TYPE_OPTIONS = [
+  { value: "Free", emoji: "🆓", label: "Free" },
+  { value: "Paid", emoji: "💰", label: "Paid" },
+  { value: "Open Source", emoji: "🔓", label: "Open Source" },
+] as const;
+
+export default async function EditProjectPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ id: string }>;
   searchParams: Promise<{ error?: string }>;
 }) {
+  const { id } = await params;
   const { error } = await searchParams;
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -17,30 +27,39 @@ export default async function NewProjectPage({
 
   if (!user) redirect("/auth/login");
 
+  const { data: project } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (!project || project.user_id !== user.id) notFound();
+
+  const category =
+    (project.tags as string[] | null)?.find((t) =>
+      (CATEGORIES as readonly string[]).includes(t)
+    ) ?? "";
+
   return (
     <div className="mx-auto max-w-xl px-4 py-12">
       <div className="mb-8">
         <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted">
-          Share your work
+          Your projects
         </p>
         <h1
           className="text-3xl"
           style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
         >
-          <span className="text-teal-deep">Add a</span>{" "}
+          <span className="text-teal-deep">Edit</span>{" "}
           <span className="text-orange">project</span>
         </h1>
-        <p className="mt-1 text-sm text-muted">
-          Free to list. Your app can be free, paid, or open source.
-        </p>
       </div>
 
       {error && <FormAlert message={error} />}
 
-      <form action={addProject} className="flex flex-col gap-6">
+      <form action={updateProject} className="flex flex-col gap-6">
+        <input type="hidden" name="project_id" value={id} />
         <div className="rounded-xl border border-border bg-surface p-6 flex flex-col gap-5">
-
-          {/* Title */}
           <div className="flex flex-col gap-1.5">
             <label htmlFor="title" className="text-sm font-medium text-teal-deep">
               Project name <span className="text-orange">*</span>
@@ -50,12 +69,11 @@ export default async function NewProjectPage({
               name="title"
               required
               type="text"
-              placeholder="e.g. Focusblock"
+              defaultValue={project.title}
               className="h-9 rounded-lg border border-border bg-cream px-3 text-sm text-teal-deep placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-teal"
             />
           </div>
 
-          {/* Description */}
           <div className="flex flex-col gap-1.5">
             <label htmlFor="description" className="text-sm font-medium text-teal-deep">
               Description <span className="text-orange">*</span>
@@ -65,28 +83,23 @@ export default async function NewProjectPage({
               name="description"
               required
               rows={3}
-              placeholder="What does it do? Who is it for?"
+              defaultValue={project.description}
               className="rounded-lg border border-border bg-cream px-3 py-2 text-sm text-teal-deep placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-teal resize-none"
             />
           </div>
 
-          {/* Project type */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-teal-deep">
               Type <span className="text-orange">*</span>
             </label>
-            <p className="text-xs text-muted -mt-1">Pick all that apply.</p>
             <div className="flex flex-wrap gap-2">
-              {([
-                { value: "Free",        emoji: "🆓", label: "Free"        },
-                { value: "Paid",        emoji: "💰", label: "Paid"        },
-                { value: "Open Source", emoji: "🔓", label: "Open Source" },
-              ]).map(({ value, emoji, label }) => (
+              {PROJECT_TYPE_OPTIONS.map(({ value, emoji, label }) => (
                 <label key={value} className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="checkbox"
                     name="project_type"
                     value={value}
+                    defaultChecked={project.project_type?.includes(value)}
                     className="sr-only peer"
                   />
                   <span className="rounded-full border border-border bg-cream px-3 py-1 text-xs font-medium text-muted transition-colors peer-checked:border-teal peer-checked:bg-teal peer-checked:text-white group-hover:border-teal group-hover:text-teal">
@@ -97,22 +110,25 @@ export default async function NewProjectPage({
             </div>
           </div>
 
-          {/* Category */}
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="category" className="text-sm font-medium text-teal-deep">Category</label>
+            <label htmlFor="category" className="text-sm font-medium text-teal-deep">
+              Category
+            </label>
             <select
               id="category"
               name="category"
+              defaultValue={category}
               className="h-9 rounded-lg border border-border bg-cream px-3 text-sm text-teal-deep focus:outline-none focus:ring-2 focus:ring-teal"
             >
               <option value="">Select a category…</option>
               {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
             </select>
           </div>
 
-          {/* Link */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="link_url" className="text-sm font-medium text-teal-deep">
@@ -123,44 +139,47 @@ export default async function NewProjectPage({
                 name="link_url"
                 required
                 type="url"
-                placeholder="https://yourproject.com"
+                defaultValue={project.link_url ?? ""}
                 className="h-9 rounded-lg border border-border bg-cream px-3 text-sm text-teal-deep placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-teal"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="link_label" className="text-sm font-medium text-teal-deep">Link label</label>
+              <label htmlFor="link_label" className="text-sm font-medium text-teal-deep">
+                Link label
+              </label>
               <input
                 id="link_label"
                 name="link_label"
                 type="text"
-                placeholder="e.g. View on GitHub"
+                defaultValue={project.link_label ?? ""}
                 className="h-9 rounded-lg border border-border bg-cream px-3 text-sm text-teal-deep placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-teal"
               />
             </div>
           </div>
 
-          {/* Cover image URL */}
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="image_url" className="text-sm font-medium text-teal-deep">Cover image URL</label>
+            <label htmlFor="image_url" className="text-sm font-medium text-teal-deep">
+              Cover image URL
+            </label>
             <input
               id="image_url"
               name="image_url"
               type="url"
-              placeholder="https://…"
+              defaultValue={project.image_url ?? ""}
               className="h-9 rounded-lg border border-border bg-cream px-3 text-sm text-teal-deep placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-teal"
             />
-            <p className="text-xs text-muted">Paste a public image URL (Unsplash, Imgur, etc.)</p>
           </div>
-
         </div>
 
         <div className="flex items-center justify-between">
-          <a href="/profile" className="text-sm text-muted hover:text-teal">← Back to profile</a>
+          <a href="/profile" className="text-sm text-muted hover:text-teal">
+            ← Back to profile
+          </a>
           <button
             type="submit"
             className="rounded-lg bg-orange px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-terra"
           >
-            Post project
+            Save changes
           </button>
         </div>
       </form>
