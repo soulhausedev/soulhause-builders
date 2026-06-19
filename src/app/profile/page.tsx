@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ROLES } from "@/lib/mock-data";
 import { saveProfile } from "./actions";
 import { AvatarUpload } from "@/components/ui/avatar-upload";
+import { DeleteProfileButton } from "@/components/ui/delete-profile-button";
 import { DeleteProjectButton } from "@/components/ui/delete-project-button";
 import { FormAlert } from "@/components/ui/form-alert";
 import { ProjectTypeBadges, categoryTags } from "@/components/ui/project-type-badges";
@@ -293,6 +294,18 @@ export default async function ProfilePage({
             </button>
           </div>
         </form>
+      </section>
+
+      {/* ── Danger zone ── */}
+      <section className="rounded-xl border border-orange/20 bg-orange/5 p-6">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-orange">
+          Danger zone
+        </p>
+        <h2 className="mb-2 text-lg font-semibold text-teal-deep">Delete account</h2>
+        <p className="mb-4 max-w-xl text-sm text-muted">
+          Remove your profile, projects, and all associated data from Soulhause Builders.
+        </p>
+        <DeleteProfileButton username={profile?.username} />
       </section>
 
     </div>

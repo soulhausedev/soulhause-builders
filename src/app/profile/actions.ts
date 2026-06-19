@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { validateUrl } from "@/lib/validate-url";
 import { DEFAULT_PROFILE_THEME, isValidProfileThemeKey } from "@/lib/profile-themes";
 import { redirect } from "next/navigation";
@@ -53,4 +54,48 @@ export async function saveProfile(formData: FormData) {
   }
 
   redirect("/profile");
+}
+
+export async function deleteProfile() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/auth/login");
+
+  const { data: projects } = await supabase
+    .from("projects")
+    .select("id")
+    .eq("user_id", user.id);
+
+  const projectIds = (projects ?? []).map((p) => p.id);
+
+  if (projectIds.length > 0) {
+    await supabase.from("votes").delete().in("project_id", projectIds);
+  }
+
+  await supabase.from("votes").delete().eq("user_id", user.id);
+  await supabase.from("projects").delete().eq("user_id", user.id);
+
+  const { data: avatarFiles } = await supabase.storage.from("avatars").list(user.id);
+  if (avatarFiles?.length) {
+    await supabase.storage
+      .from("avatars")
+      .remove(avatarFiles.map((f) => `${user.id}/${f.name}`));
+  }
+
+  const { error: profileError } = await supabase.from("profiles").delete().eq("id", user.id);
+
+  if (profileError) {
+    redirect("/profile?error=" + encodeURIComponent(profileError.message));
+  }
+
+  const admin = createAdminClient();
+  if (admin) {
+    await admin.auth.admin.deleteUser(user.id);
+  }
+
+  await supabase.auth.signOut();
+  redirect("/");
 }

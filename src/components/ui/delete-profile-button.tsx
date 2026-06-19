@@ -1,50 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import { deleteProject } from "@/app/projects/[id]/edit/actions";
+import { deleteProfile } from "@/app/profile/actions";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
-export function DeleteProjectButton({
-  projectId,
-  projectTitle,
-  variant = "link",
-}: {
-  projectId: string;
-  projectTitle: string;
-  variant?: "link" | "button";
-}) {
+export function DeleteProfileButton({ username }: { username?: string | null }) {
   const [open, setOpen] = useState(false);
-
-  const triggerClassName =
-    variant === "button"
-      ? "rounded-lg border border-orange/30 px-4 py-2.5 text-sm font-medium text-orange transition-colors hover:bg-orange/10"
-      : "text-xs text-muted hover:text-orange";
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className={triggerClassName}>
-        Delete
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="rounded-lg border border-orange/30 px-4 py-2 text-sm font-medium text-orange transition-colors hover:bg-orange/10"
+      >
+        Delete profile
       </button>
 
       <ConfirmModal
         open={open}
         onClose={() => setOpen(false)}
-        title="Delete this project?"
+        title="Delete your profile?"
       >
         <p className="mb-4 text-sm text-muted leading-relaxed">
-          This permanently removes the project and all its votes from Soulhause Builders.
-          This can&apos;t be undone.
+          This permanently removes your public profile, all projects, votes, and avatar.
+          You won&apos;t be able to recover this account. This can&apos;t be undone.
         </p>
 
-        <p className="mb-4 text-sm text-teal-deep">
-          Project: <span className="font-medium">{projectTitle}</span>
-        </p>
+        {username && (
+          <p className="mb-4 text-sm text-teal-deep">
+            Profile: <span className="font-medium">@{username}</span>
+          </p>
+        )}
 
         <form
-          action={deleteProject}
+          action={deleteProfile}
           className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3"
         >
-          <input type="hidden" name="project_id" value={projectId} />
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -56,7 +48,7 @@ export function DeleteProjectButton({
             type="submit"
             className="rounded-lg bg-orange px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-terra"
           >
-            Yes, delete project
+            Yes, delete my profile
           </button>
         </form>
       </ConfirmModal>
