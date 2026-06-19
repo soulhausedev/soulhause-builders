@@ -16,7 +16,7 @@ export function SunCursor() {
 
     const move = (e: MouseEvent) => {
       setPos({ x: e.clientX, y: e.clientY });
-      setVisible(true);
+      setVisible(!document.body.classList.contains("modal-open"));
     };
     const hide = () => setVisible(false);
 

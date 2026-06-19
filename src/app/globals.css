@@ -36,6 +36,18 @@ body {
 /* ─── Custom sun cursor — mouse only, not touch ─────────────────────────── */
 @media (pointer: fine) {
   * { cursor: none !important; }
+
+  /* Restore native pointer while a modal is open (dialog top layer hides sun cursor) */
+  body.modal-open,
+  body.modal-open * {
+    cursor: auto !important;
+  }
+
+  body.modal-open button:not(:disabled),
+  body.modal-open a,
+  body.modal-open [role="button"] {
+    cursor: pointer !important;
+  }
 }
 
 @keyframes sun-spin {

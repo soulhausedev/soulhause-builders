@@ -21,15 +21,24 @@ export function ConfirmModal({
 
     if (open && !dialog.open) {
       dialog.showModal();
+      document.body.classList.add("modal-open");
     } else if (!open && dialog.open) {
       dialog.close();
+      document.body.classList.remove("modal-open");
     }
+
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
   }, [open]);
 
   return (
     <dialog
       ref={dialogRef}
-      onClose={onClose}
+      onClose={() => {
+        document.body.classList.remove("modal-open");
+        onClose();
+      }}
       onClick={(e) => {
         if (e.target === dialogRef.current) onClose();
       }}

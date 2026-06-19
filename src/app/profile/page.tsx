@@ -9,15 +9,17 @@ import { FormAlert } from "@/components/ui/form-alert";
 import { ProjectTypeBadges, categoryTags } from "@/components/ui/project-type-badges";
 import { SkillsPicker } from "@/components/ui/skills-picker";
 import { ThemePicker } from "@/components/ui/theme-picker";
+import { ProfileThemeShell } from "@/components/ui/profile-theme-shell";
+import { getProfileTheme } from "@/lib/profile-themes";
 import Image from "next/image";
 import Link from "next/link";
 
 export default async function ProfilePage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; saved?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, saved } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -46,70 +48,82 @@ export default async function ProfilePage({
     .slice(0, 2);
 
   const displayName = profile?.full_name || user.email || "Builder";
+  const theme = getProfileTheme(profile?.profile_theme);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12 space-y-10 sm:space-y-12">
 
       {error && <FormAlert message={error} />}
+      {saved === "1" && (
+        <FormAlert
+          variant="success"
+          message="Profile saved. Your theme is live on your public profile."
+        />
+      )}
 
       {/* ── Profile summary card ── */}
-      <section className="rounded-2xl border border-border bg-surface p-4 sm:p-6 flex items-start gap-4 sm:gap-5">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full overflow-hidden text-2xl font-bold text-white bg-teal">
-          {profile?.avatar_url ? (
-            <Image
-              src={profile.avatar_url}
-              alt={displayName}
-              width={64}
-              height={64}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            initials
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1
-            className="text-2xl leading-tight"
-            style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
+      <ProfileThemeShell themeKey={profile?.profile_theme}>
+        <section className="profile-card rounded-2xl border p-4 sm:p-6 flex items-start gap-4 sm:gap-5">
+          <div
+            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full overflow-hidden text-2xl font-bold text-white"
+            style={{ backgroundColor: theme.avatarFallback }}
           >
-            <span className="text-teal-deep">{displayName}</span>
-          </h1>
-          {profile?.username && (
-            <p className="text-sm text-muted mt-0.5">
-              @{profile.username} ·{" "}
-              <Link href={`/${profile.username}`} className="text-teal hover:underline">
-                view public profile →
-              </Link>
-            </p>
-          )}
-          {profile?.role && (
-            <p className="mt-1 text-sm font-medium text-orange">{profile.role}</p>
-          )}
-          {profile?.bio && (
-            <p className="mt-2 text-sm text-muted leading-relaxed">{profile.bio}</p>
-          )}
-          {profile?.location && (
-            <p className="mt-1 text-xs text-muted">{profile.location}</p>
-          )}
-          {profile?.skills?.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {profile.skills.map((s: string) => (
-                <span
-                  key={s}
-                  className="rounded-full border border-border bg-cream px-2.5 py-0.5 text-xs font-medium text-teal-deep"
-                >
-                  {s}
-                </span>
-              ))}
+            {profile?.avatar_url ? (
+              <Image
+                src={profile.avatar_url}
+                alt={displayName}
+                width={64}
+                height={64}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              initials
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1
+              className="profile-heading text-2xl leading-tight"
+              style={{ fontFamily: "var(--font-retro)", fontWeight: 700 }}
+            >
+              {displayName}
+            </h1>
+            {profile?.username && (
+              <p className="profile-muted text-sm mt-0.5">
+                @{profile.username} ·{" "}
+                <Link href={`/${profile.username}`} className="profile-link hover:underline">
+                  view public profile →
+                </Link>
+              </p>
+            )}
+            {profile?.role && (
+              <p className="profile-accent mt-1 text-sm font-medium">{profile.role}</p>
+            )}
+            {profile?.bio && (
+              <p className="profile-muted mt-2 text-sm leading-relaxed">{profile.bio}</p>
+            )}
+            {profile?.location && (
+              <p className="profile-muted mt-1 text-xs">{profile.location}</p>
+            )}
+            {profile?.skills?.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {profile.skills.map((s: string) => (
+                  <span
+                    key={s}
+                    className="profile-tag rounded-full border px-2.5 py-0.5 text-xs font-medium"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          {profile?.full_name && (
+            <div className="profile-muted text-xs text-right shrink-0 hidden sm:block">
+              {profile.full_name}
             </div>
           )}
-        </div>
-        {profile?.full_name && (
-          <div className="text-xs text-muted text-right shrink-0 hidden sm:block">
-            {profile.full_name}
-          </div>
-        )}
-      </section>
+        </section>
+      </ProfileThemeShell>
 
       {/* ── My Projects ── */}
       <section>
@@ -280,9 +294,16 @@ export default async function ProfilePage({
           <div className="rounded-xl border border-border bg-surface p-6">
             <p className="mb-1 text-sm font-semibold text-teal-deep">Profile theme</p>
             <p className="mb-4 text-xs text-muted">
-              Pick a vibe for your public profile — personality, interests, or culture.
+              Pick a vibe for your public profile — personality, interests, or mood.
             </p>
-            <ThemePicker defaultTheme={profile?.profile_theme} />
+            <ThemePicker
+              defaultTheme={profile?.profile_theme}
+              preview={{
+                name: displayName,
+                username: profile?.username,
+                role: profile?.role,
+              }}
+            />
           </div>
 
           <div className="flex justify-end">

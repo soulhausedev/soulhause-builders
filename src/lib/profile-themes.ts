@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-export type ProfileThemeCategory = "default" | "personality" | "interest" | "culture";
+export type ProfileThemeCategory = "default" | "personality" | "interest" | "vibe";
 
 export type ProfileTheme = {
   name: string;
@@ -144,47 +144,75 @@ export const PROFILE_THEMES = {
     avatarFallback: "#7C3AED",
     tagBg: "#252525",
   },
-  baltimore: {
-    name: "Baltimore",
-    category: "culture",
-    background: "#2A1A4A",
-    card: "#3B275C",
-    text: "#F2E9FF",
-    textMuted: "#B8A0D0",
-    accent: "#FFB400",
-    accentSecondary: "#FF6B35",
-    border: "#5A4080",
-    radius: "16px",
-    avatarFallback: "#FFB400",
-    tagBg: "#4A3570",
-  },
-  dmv: {
-    name: "DMV",
-    category: "culture",
-    background: "#F5EEF0",
-    card: "#FDF8F9",
-    text: "#3D1F2E",
-    textMuted: "#8A6070",
-    accent: "#E8437A",
-    accentSecondary: "#6B2D5B",
-    border: "#E8C8D4",
+  midnight: {
+    name: "Midnight",
+    category: "vibe",
+    background: "#0B0F1A",
+    card: "#141B2D",
+    text: "#E8ECF4",
+    textMuted: "#7A8499",
+    accent: "#6B8CFF",
+    accentSecondary: "#A8B8E8",
+    border: "#252D42",
     radius: "14px",
-    avatarFallback: "#E8437A",
-    tagBg: "#F0D8E0",
+    avatarFallback: "#6B8CFF",
+    tagBg: "#1C2438",
   },
-  hiphop: {
-    name: "Hip-Hop",
-    category: "culture",
-    background: "#0C0C0C",
-    card: "#1C1C1C",
-    text: "#F5F0E0",
-    textMuted: "#A09080",
-    accent: "#FFD700",
-    accentSecondary: "#CC2200",
-    border: "#3A3A3A",
-    radius: "6px",
-    avatarFallback: "#FFD700",
-    tagBg: "#2A2A2A",
+  glow: {
+    name: "Day Glow",
+    category: "vibe",
+    background: "#080C10",
+    card: "#0F161C",
+    text: "#D8FFF0",
+    textMuted: "#5A8A78",
+    accent: "#39FF14",
+    accentSecondary: "#00FFD5",
+    border: "#1A3D32",
+    radius: "12px",
+    avatarFallback: "#39FF14",
+    tagBg: "#142820",
+  },
+  aurora: {
+    name: "Aurora",
+    category: "vibe",
+    background: "#0A1218",
+    card: "#101E28",
+    text: "#E0F8FF",
+    textMuted: "#6A9AAA",
+    accent: "#00E5CC",
+    accentSecondary: "#B388FF",
+    border: "#1A3540",
+    radius: "16px",
+    avatarFallback: "#00E5CC",
+    tagBg: "#152830",
+  },
+  neon: {
+    name: "Neon",
+    category: "vibe",
+    background: "#0A0612",
+    card: "#140A1E",
+    text: "#F5E8FF",
+    textMuted: "#9A78B8",
+    accent: "#FF2E97",
+    accentSecondary: "#00F0FF",
+    border: "#2A1840",
+    radius: "10px",
+    avatarFallback: "#FF2E97",
+    tagBg: "#1E1030",
+  },
+  dusk: {
+    name: "Dusk",
+    category: "vibe",
+    background: "#15101F",
+    card: "#1E1828",
+    text: "#F0E8F8",
+    textMuted: "#9A88AA",
+    accent: "#FF8C69",
+    accentSecondary: "#9B7EDE",
+    border: "#2E2640",
+    radius: "18px",
+    avatarFallback: "#FF8C69",
+    tagBg: "#261E34",
   },
 } as const satisfies Record<string, ProfileTheme>;
 
@@ -198,7 +226,7 @@ const CATEGORY_LABELS: Record<ProfileThemeCategory, string> = {
   default: "Default",
   personality: "Personality",
   interest: "Interests",
-  culture: "Culture",
+  vibe: "Vibe",
 };
 
 export function getProfileTheme(key?: string | null): ProfileTheme {
@@ -237,7 +265,7 @@ export function themesByCategory(): { category: ProfileThemeCategory; label: str
     groups.set(category, list);
   }
 
-  const order: ProfileThemeCategory[] = ["default", "personality", "interest", "culture"];
+  const order: ProfileThemeCategory[] = ["default", "personality", "interest", "vibe"];
   return order
     .filter((c) => groups.has(c))
     .map((category) => ({

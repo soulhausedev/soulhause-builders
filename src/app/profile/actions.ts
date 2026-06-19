@@ -50,10 +50,10 @@ export async function saveProfile(formData: FormData) {
 
   const username = updates.username;
   if (username) {
-    redirect(`/${username}`);
+    redirect("/profile?saved=1");
   }
 
-  redirect("/profile");
+  redirect("/profile?saved=1");
 }
 
 export async function deleteProfile() {
