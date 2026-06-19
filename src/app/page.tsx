@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { SoulhauseMission } from "@/components/layout/soulhause-mission";
 import { ProjectCard } from "@/components/ui/project-card";
 import { PeopleCard } from "@/components/ui/people-card";
 import { SunMark } from "@/components/ui/sun-mark";
@@ -192,6 +193,8 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      <SoulhauseMission />
 
       {/* ── CTA ──────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-t border-border bg-teal-deep">
